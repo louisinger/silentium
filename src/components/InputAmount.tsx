@@ -4,6 +4,7 @@ import Label from './Label'
 import { fromSatoshis, prettyNumber, toSatoshis } from '../lib/format'
 import { ConfigContext, Unit } from '../providers/config'
 import { FiatContext } from '../providers/fiat'
+import Input from './Input'
 
 enum UnitLabel {
   BTC = 'BTC',
@@ -68,13 +69,13 @@ export default function InputAmount({ label, onChange }: InputAmountProps) {
   return (
     <fieldset className='text-left text-gray-800 dark:text-gray-100 w-full'>
       {label ? <Label text={label} /> : null}
-      <div className='flex items-center h-12 rounded-l-md bg-gray-100 dark:bg-gray-800'>
+      <div className='flex items-center h-12 rounded-l-md bg-gray-100 dark:bg-darklessgray mb-1'>
         {isMobile ? (
           <p className={className}>{amount}</p>
         ) : (
-          <input type='text' placeholder='0' onChange={(e) => setAmount(e.target.value)} className={className} />
+          <Input type='text' placeholder='0' onChange={(e) => setAmount(e.target.value)} />
         )}
-        <div className='w-16 h-full flex items-center rounded-r-md text-sm bg-gray-400 text-gray-100 dark:text-gray-800'>
+        <div className='w-16 h-full flex items-center rounded-r-md text-sm bg-gray-400 text-gray-100 dark:text-gray-800 dark:bg-darklessgray'>
           <div className='mx-auto font-semibold'>{unit}</div>
         </div>
       </div>
@@ -89,7 +90,7 @@ export default function InputAmount({ label, onChange }: InputAmountProps) {
           {keys.map((k) => (
             <p
               key={k}
-              className='text-center p-3 sm:p-5 bg-gray-100 dark:bg-gray-800 select-none'
+              className='text-center p-3 sm:p-5 bg-gray-100 dark:bg-darklessgray select-none'
               onClick={() => clickHandler(k)}
             >
               {k}
