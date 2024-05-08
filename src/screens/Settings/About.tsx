@@ -12,20 +12,27 @@ export default function About() {
     <Container>
       <Content>
         <Title text='About' />
-        <div className='flex flex-col gap-6 mt-10'>
+        <div className='flex flex-col gap-5 justify-center'>
+          <img src='/logo.svg' alt='Logo' className='w-24 h-32 mx-auto' />
+          <p>
+            <a className='text-primary cursor-pointer' href='https://github.com/louisinger/silentium'>
+              Silentium
+            </a>{' '}
+            by{' '}
+            <a className='text-primary cursor-pointer' href='https://github.com/louisinger'>
+              louisinger
+            </a>
+          </p>
           <p>
             Uses{' '}
-            <a className='underline cursor-pointer' href='https://mempool.space'>
+            <a className='text-primary cursor-pointer' href='https://mempool.space'>
               mempool.space
             </a>{' '}
             or{' '}
-            <a className='underline cursor-pointer' href='https://blockstream.info'>
+            <a className='text-primary cursor-pointer' href='https://blockstream.info'>
               blockstream.info
             </a>{' '}
             to fetch information from the chain
-          </p>
-          <p className='underline cursor-pointer'>
-            <a href='https://github.com/louisinger/silentium'>Github</a>
           </p>
         </div>
       </Content>
