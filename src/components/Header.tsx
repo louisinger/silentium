@@ -28,7 +28,7 @@ export default function Header() {
       <button
         onClick={handleClick}
         aria-label='Back to homepage'
-        className={(reloading ? 'animate-pulse ' : '') + 'p-2 rounded-full bg-gray-100 dark:bg-gray-800'}
+        className={(reloading ? 'animate-pulse ' : '') + 'p-2 rounded-full bg-gray-100 dark:bg-white'}
       >
         <LogoIcon />
       </button>

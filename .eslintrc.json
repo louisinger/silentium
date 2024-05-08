@@ -1,0 +1,65 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "plugins": ["react", "react-hooks", "@typescript-eslint", "prettier"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    },
+    "react": {
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "spaced-comment": "error",
+    "no-duplicate-imports": "error",
+    "array-callback-return": ["error", { "allowImplicit": true }],
+    "@typescript-eslint/no-explicit-any": ["off", { "ignoreRestArgs": false }],
+    "@typescript-eslint/no-unused-vars": ["warn"],
+    "react/hook-use-state": ["error"],
+    "react/no-array-index-key": ["error"],
+    "react/jsx-boolean-value": ["error"],
+    "react/jsx-filename-extension": ["error", { "extensions": [".jsx", "tsx"] }],
+    "react/jsx-no-leaked-render": ["error"],
+    "react/self-closing-comp": [
+      "warn",
+      {
+        "component": true,
+        "html": true
+      }
+    ],
+    "react/jsx-curly-brace-presence": [
+      "error",
+      { "props": "never", "children": "never", "propElementValues": "always" }
+    ],
+    "react/jsx-pascal-case": [
+      "error",
+      {
+        "allowAllCaps": false,
+        "allowNamespace": false,
+        "allowLeadingUnderscore": false
+      }
+    ],
+    "react/react-in-jsx-scope": ["off"],
+    "no-console": ["warn", { "allow": ["log", "error"] }],
+    "@typescript-eslint/array-type": ["error"],
+    "@typescript-eslint/quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true,
+        "allowTemplateLiterals": true
+      }
+    ]
+  }
+}
