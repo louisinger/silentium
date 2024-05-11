@@ -47,9 +47,6 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
 
   const toggleShowConfig = () => setShowConfig(!showConfig)
 
-  const preferredTheme = () =>
-    window?.matchMedia?.('(prefers-color-scheme: dark)').matches ? Themes.Dark : Themes.Light
-
   const updateConfig = (data: Config) => {
     setConfig(data)
     updateTheme(data)
@@ -68,7 +65,7 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!loading) return
-    const config = readConfigFromStorage() ?? { ...defaultConfig, theme: preferredTheme() }
+    const config = readConfigFromStorage() ?? { ...defaultConfig }
     updateConfig(config)
     setLoading(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
