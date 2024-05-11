@@ -30,6 +30,9 @@ export default function SendSuccess() {
           <div className='m-auto'>
             <SuccessIcon />
           </div>
+          <div className='m-auto'>
+            <p className='text-center'>{sendInfo.txid}</p>
+          </div>
         </div>
       </Content>
       <ButtonsOnBottom>

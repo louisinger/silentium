@@ -8,7 +8,8 @@ export enum ExplorerName {
 }
 
 export interface ExplorerURLs {
-  restApiExplorerURL: string
+  rest: string
+  web: string
 }
 
 export interface Explorer {
@@ -22,22 +23,26 @@ const explorers: Explorer[] = [
   {
     name: ExplorerName.Blockstream,
     [NetworkName.Mainnet]: {
-      restApiExplorerURL: 'https://blockstream.info/api/',
+      rest: 'https://blockstream.info/api/',
+      web: 'https://blockstream.info/',
     },
     [NetworkName.Testnet]: {
-      restApiExplorerURL: 'https://blockstream.info/testnet/api/',
+      rest: 'https://blockstream.info/testnet/api/',
+      web: 'https://blockstream.info/testnet/',
     },
   },
   {
     name: ExplorerName.Mempool,
     [NetworkName.Mainnet]: {
-      restApiExplorerURL: 'https://mempool.space/api/',
+      rest: 'https://mempool.space/api/',
+      web: 'https://mempool.space/',
     },
   },
   {
     name: ExplorerName.Nigiri,
     [NetworkName.Regtest]: {
-      restApiExplorerURL: 'http://localhost:3000',
+      rest: 'http://localhost:3000',
+      web: 'http://localhost:3000',
     },
   },
 ]
@@ -49,14 +54,22 @@ export const getRestApiExplorerURL = ({ explorer, network }: Wallet): string => 
   const exp = explorers.find((e) => e.name === explorer)
   if (!exp) throw new Error('Explorer not found')
   if (!exp[network]) throw new Error(`Explorer ${explorer} does not support ${network}`)
-  const url = exp[network]?.restApiExplorerURL
+  const url = exp[network]?.rest
+  if (!url) throw new Error('Explorer URL not found')
+  return url
+}
+
+const getWebExplorerURL = ({ explorer, network }: Wallet): string => {
+  const exp = explorers.find((e) => e.name === explorer)
+  if (!exp) throw new Error('Explorer not found')
+  if (!exp[network]) throw new Error(`Explorer ${explorer} does not support ${network}`)
+  const url = exp[network]?.web
   if (!url) throw new Error('Explorer URL not found')
   return url
 }
 
 export const getTxIdURL = (txid: string, wallet: Wallet) => {
-  // stupid bug from mempool
-  const url = getRestApiExplorerURL(wallet)
+  const url = getWebExplorerURL(wallet)
   return `${url}/tx/${txid}`
 }
 
