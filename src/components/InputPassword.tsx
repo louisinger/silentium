@@ -9,6 +9,7 @@ interface InputPasswordProps {
 }
 
 export default function InputPassword({ label, onChange }: InputPasswordProps) {
+  const className = 'w-full p-3 text-sm font-semibold bg-gray-100 dark:bg-darklessgray focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent rounded-md'
   const [type, setType] = useState('password')
 
   const toggleVisibility = () => setType(type === 'text' ? 'password' : 'text')
@@ -19,7 +20,7 @@ export default function InputPassword({ label, onChange }: InputPasswordProps) {
       <div className='flex items-center h-12 rounded-l-md bg-gray-100 dark:bg-gray-800'>
         <input
           autoComplete='new-password'
-          className='w-full p-3 text-sm font-semibold rounded-l-md bg-gray-100 dark:bg-gray-800'
+          className={className}
           onChange={onChange}
           type={type}
         />

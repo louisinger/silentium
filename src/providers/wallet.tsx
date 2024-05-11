@@ -25,7 +25,7 @@ const defaultWallet: Wallet = {
   explorer: defaultExplorer,
   network: defaultNetwork,
   silentiumURL: {
-    [NetworkName.Mainnet]: '',
+    [NetworkName.Mainnet]: 'https://mainnet.silentium.dev/v1',
     [NetworkName.Testnet]: '',
     [NetworkName.Regtest]: 'http://localhost:9000/v1',
   },
@@ -135,22 +135,26 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
       const updater = new Updater(explorer, silentiumAPI, scanPrivKey, spendPubKey, p2trScript)
 
-      const totalBlocks = chainTip - wallet.scannedBlockHeight[wallet.network] + 1
+      const totalBlocks = chainTip - wallet.scannedBlockHeight[wallet.network]
       const percentPerBlock = 100 / totalBlocks
       let progress = 0
 
       for (let i = wallet.scannedBlockHeight[wallet.network] + 1; i <= chainTip; i++) {
-        const updateResult = await updater.updateHeight(i, wallet.utxos[wallet.network])
-        wallet = {
-          ...applyUpdate(wallet, updateResult),
-          scannedBlockHeight: { ...wallet.scannedBlockHeight, [wallet.network]: i },
+        try {
+          const updateResult = await updater.updateHeight(i, wallet.utxos[wallet.network])
+          wallet = {
+            ...applyUpdate(wallet, updateResult),
+            scannedBlockHeight: { ...wallet.scannedBlockHeight, [wallet.network]: i },
+          }
+          setWallet(wallet)
+        } catch (e) {
+          notify(extractErrorMessage(e))
+          continue
+        } finally {
+          progress += percentPerBlock
+          progress = Math.min(Math.round(progress), 100)
+          setScanningProgress(progress)
         }
-
-        progress += percentPerBlock
-        progress = Math.min(Math.round(progress), 100)
-
-        setScanningProgress(progress)
-        setWallet(wallet)
       }
     } catch (e) {
       console.error(e)

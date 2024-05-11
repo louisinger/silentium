@@ -23,6 +23,7 @@ export default function ScanButton() {
   return (
     <>
       {askPassword ? <NeedsPassword title='Scan' onMnemonic={handleMnemonicUnlock} onClose={() => setAskPassword(false)} /> : null}
+      {scanning ? <p className='animate-bounce' >{wallet.scannedBlockHeight[wallet.network]} ({scanningProgress}%)</p> : null}
       <Button progress={scanningProgress} icon={<SearchIcon />} label='Scan' onClick={() => handleScan()} disabled={scanning} />
     </>
   )

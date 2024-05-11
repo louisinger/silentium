@@ -13,14 +13,12 @@ export enum Unit {
 }
 
 export interface Config {
-  notifications: boolean
   theme: Themes
   unit: Unit
 }
 
 const defaultConfig: Config = {
-  notifications: false,
-  theme: Themes.Light,
+  theme: Themes.Dark,
   unit: Unit.BTC,
 }
 

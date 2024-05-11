@@ -23,7 +23,6 @@ export class Updater {
   async updateHeight(height: number, currentUtxos: Utxo[]): Promise<UpdateResult> {
     const { filter, blockhash } = await this.silentiumAPI.getBlockFilter(height)
     const blockScalars = await this.silentiumAPI.getBlockScalars(height)
-    const blockTimestamp = await this.chainSource.getBlockTime(blockhash)
 
     const basicFilter = new BasicFilter(blockhash, filter)
 
@@ -57,6 +56,8 @@ export class Updater {
       newUtxos: [],
       transactions: [],
     }
+    
+    const blockTimestamp = await this.chainSource.getBlockTime(blockhash)
 
     for (const tx of block.transactions) {
       if (spentScriptsToFind.size === 0 && fundedScriptsToFind.size === 0 && !p2trInBlock) {

@@ -13,7 +13,7 @@ interface ButtonProps {
 export default function Button({ disabled, icon, label, onClick, secondary, progress }: ButtonProps) {
   const contentClass = classNames('flex justify-center items-center mx-8 py-3')
 
-  const fillerClass = classNames('z-2 absolute bg-primary h-2 rounded-md w-full transition-all duration-300 ease-in-out mb-0', {
+  const fillerClass = classNames('z-2 relative bg-primary h-2 rounded-md w-full transition-all duration-300 ease-in-out mb-0', {
     'animate-pulse': progress !== undefined,
   })
 

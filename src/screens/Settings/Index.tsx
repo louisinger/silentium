@@ -5,8 +5,6 @@ import Header from './Header'
 import ExplorerIcon from '../../icons/Explorer'
 import NetworkIcon from '../../icons/Network'
 import ArrowIcon from '../../icons/Arrow'
-import NotificationIcon from '../../icons/Notification'
-import Notifications from './Notifications'
 import { WalletContext } from '../../providers/wallet'
 import Reload from './Reload'
 import ReloadIcon from '../../icons/Reload'
@@ -66,10 +64,6 @@ export default function Settings() {
       option: Options.Network,
     },
     {
-      icon: <NotificationIcon />,
-      option: Options.Notifications,
-    },
-    {
       icon: <EncryptIcon />,
       option: Options.Password,
     },
@@ -120,7 +114,6 @@ export default function Settings() {
         {option === Options.Backup && <Backup />}
         {option === Options.Explorer && <Explorer />}
         {option === Options.Network && <Network />}
-        {option === Options.Notifications && <Notifications />}
         {option === Options.Password && <Password />}
         {option === Options.Reload && <Reload />}
         {option === Options.Reset && <Reset backup={() => setOption(Options.Backup)} />}

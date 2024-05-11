@@ -83,12 +83,12 @@ export default function InitOld() {
       <Content>
         <Title text='Restore wallet' subtext='Insert your secret words' />
         {step === Step.Passphrase ? (
-          <div className='flex flex-col gap-2'>
+          <div className='flex flex-col gap-2 align-middle justify-center'>
             <Error error={label === ButtonLabel.Invalid} text={label} />
             <Columns>
               {[...passphrase].map((word, i) => (
                 // eslint-disable-next-line react/no-array-index-key
-                <Word key={i} left={i + 1} onChange={(e: any) => handleChange(e, i)} text={word} />
+                <Word key={i} label={i + 1} onChange={(e: any) => handleChange(e, i)} text={word} />
               ))}
             </Columns>
           </div>
