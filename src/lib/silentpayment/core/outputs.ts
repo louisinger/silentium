@@ -9,7 +9,7 @@ export function createOutputs(
     smallestOutpoint: Outpoint,
     recipientAddresses: RecipientAddress[],
     network: Network,
-): Output[] {
+): [Output[], string[]] {
     const sumOfPrivateKeys = calculateSumOfPrivateKeys(inputPrivateKeys);
     const inputHash = createInputHash(
         getPublicKey(sumOfPrivateKeys),
@@ -36,6 +36,7 @@ export function createOutputs(
     }
 
     const outputs: Output[] = [];
+    const tweaks: string[] = [];
     for (const [scanKeyHex, paymentGroup] of paymentGroups.entries()) {
         const scanKey = Buffer.from(scanKeyHex, 'hex');
         const point = secp.publicKeyTweakMul(
@@ -71,10 +72,11 @@ export function createOutputs(
                 script,
                 value: amount,
             });
+            tweaks.push(tweak.toString('hex'));
             n++;
         }
     }
 
-    return outputs;
+    return [outputs, tweaks];
 };
 

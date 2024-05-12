@@ -2,7 +2,7 @@ import { ReactNode, createContext, useContext, useEffect, useState } from 'react
 import { useStorage } from '../lib/storage'
 import { NavigationContext, Pages } from './navigation'
 import { NetworkName } from '../lib/network'
-import { Mnemonic, Transactions, Utxos, PublicKeys } from '../lib/types'
+import { Mnemonic, Transactions, Utxos, PublicKeys, Transaction, Utxo } from '../lib/types'
 import { ExplorerName, getExplorerNames, getRestApiExplorerURL } from '../lib/explorers'
 import { defaultExplorer, defaultNetwork } from '../lib/constants'
 import { getSilentPaymentScanPrivateKey, isInitialized } from '../lib/wallet'
@@ -14,6 +14,7 @@ import { notify } from '../components/Toast'
 export interface Wallet {
   explorer: ExplorerName
   network: NetworkName
+  mempoolTransactions: Transactions
   transactions: Transactions
   utxos: Utxos
   publicKeys: PublicKeys
@@ -28,6 +29,11 @@ const defaultWallet: Wallet = {
     [NetworkName.Mainnet]: 'https://mainnet.silentium.dev/v1',
     [NetworkName.Testnet]: '',
     [NetworkName.Regtest]: 'http://localhost:9000/v1',
+  },
+  mempoolTransactions: {
+    [NetworkName.Mainnet]: [],
+    [NetworkName.Regtest]: [],
+    [NetworkName.Testnet]: [],
   },
   transactions: {
     [NetworkName.Mainnet]: [],
@@ -58,6 +64,7 @@ interface WalletContextProps {
   reloadWallet: (mnemonic: Mnemonic, wallet: Wallet) => void
   resetWallet: () => void
   initWallet: (publicKeys: PublicKeys, restoreFrom?: number, network?: NetworkName) => Promise<Wallet>
+  pushMempoolTransaction: (spentCoins: { txid: string; vout: number }[], newUtxos: Utxo[], txid: string) => void
   wallet: Wallet
   scanning: boolean
   scanningProgress?: number
@@ -68,6 +75,7 @@ export const WalletContext = createContext<WalletContextProps>({
   changeSilentiumURL: () => {},
   changeNetwork: () => {},
   reloadWallet: () => {},
+  pushMempoolTransaction: () => {},
   resetWallet: () => {},
   initWallet: () => Promise.resolve(defaultWallet),
   wallet: defaultWallet,
@@ -141,7 +149,11 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
       for (let i = wallet.scannedBlockHeight[wallet.network] + 1; i <= chainTip; i++) {
         try {
-          const updateResult = await updater.updateHeight(i, wallet.utxos[wallet.network])
+          const updateResult = await updater.updateHeight(
+            i, 
+            wallet.utxos[wallet.network], 
+            wallet.mempoolTransactions[wallet.network]
+          )
           wallet = {
             ...applyUpdate(wallet, updateResult),
             scannedBlockHeight: { ...wallet.scannedBlockHeight, [wallet.network]: i },
@@ -163,6 +175,40 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       setScanning(false)
       setScanningProgress(undefined)
     }
+  }
+
+  const pushMempoolTransaction = (spentCoins: { txid: string; vout: number }[], newUtxos: Utxo[], txid: string) => {
+    const tx: Transaction = {
+      amount: 0,
+      txid,
+      unixdate: Math.floor(Date.now() / 1000),
+    }
+
+    for (const coin of spentCoins) {
+      const utxo = wallet.utxos[wallet.network].find((u) => u.txid === coin.txid && u.vout === coin.vout)
+      if (utxo) tx.amount -= utxo.value
+    }
+
+    for (const coin of newUtxos) {
+      tx.amount += coin.value
+    }
+    
+    const w: Wallet = {
+      ...applyUpdate(wallet, {
+        newUtxos: newUtxos,
+        spentUtxos: spentCoins,
+        transactions: [],
+      }),
+      mempoolTransactions: {
+        ...wallet.mempoolTransactions,
+        [wallet.network]: [
+          ...wallet.mempoolTransactions[wallet.network], 
+          tx
+        ],
+      },
+    }
+
+    setWallet(w)
   }
 
   const resetWallet = () => {
@@ -206,6 +252,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         initWallet,
         scanning,
         scanningProgress,
+        pushMempoolTransaction,
       }}
     >
       {children}

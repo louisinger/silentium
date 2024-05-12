@@ -20,7 +20,7 @@ export class Updater {
     private p2trScript: Buffer,
   ) {}
 
-  async updateHeight(height: number, currentUtxos: Utxo[]): Promise<UpdateResult> {
+  async updateHeight(height: number, currentUtxos: Utxo[], mempoolTxs: Transaction[]): Promise<UpdateResult> {
     const { filter, blockhash } = await this.silentiumAPI.getBlockFilter(height)
     const blockScalars = await this.silentiumAPI.getBlockScalars(height)
 
@@ -62,6 +62,14 @@ export class Updater {
     for (const tx of block.transactions) {
       if (spentScriptsToFind.size === 0 && fundedScriptsToFind.size === 0 && !p2trInBlock) {
         break
+      }
+
+      const txid = tx.getId()
+
+      const knownTx = mempoolTxs.find((t) => t.txid === txid)
+      if (knownTx) {
+        result.transactions.push(knownTx)
+        continue
       }
 
       const txInfo: Transaction = {
@@ -174,6 +182,10 @@ export function applyUpdate(wallet: Wallet, update: UpdateResult): Wallet {
     }
   }
 
+  let newUncomfirmedTxs = wallet.mempoolTransactions[wallet.network].filter((tx) => {
+    return !update.transactions.find((t) => t.txid === tx.txid)
+  })
+
   return {
     ...wallet,
     utxos: {
@@ -183,6 +195,10 @@ export function applyUpdate(wallet: Wallet, update: UpdateResult): Wallet {
     transactions: {
       ...wallet.transactions,
       [wallet.network]: newTxs,
+    },
+    mempoolTransactions: {
+      ...wallet.mempoolTransactions,
+      [wallet.network]: newUncomfirmedTxs,
     },
   }
 }

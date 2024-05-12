@@ -6,13 +6,17 @@ import { prettyAgo, prettyNumber } from '../lib/format'
 import ArrowIcon from '../icons/Arrow'
 import { NavigationContext, Pages } from '../providers/navigation'
 import { openInNewTab } from '../lib/explorers'
+import classNames from 'classnames'
 
-const TransactionLine = ({ data, wallet }: { data: Transaction; wallet: Wallet }) => {
+const TransactionLine = ({ data, wallet, mempool }: { data: Transaction; wallet: Wallet; mempool?: boolean}) => {
   const amount = `${data.amount > 0 ? '+' : '-'} ${prettyNumber(Math.abs(data.amount))} sats`
   const date = data.unixdate ? prettyAgo(data.unixdate) : 'just now'
   return (
     <div
-      className='border border-primary cursor-pointer p-2 flex justify-between w-full rounded-md'
+      className={classNames(
+        'border border-primary cursor-pointer p-2 flex justify-between w-full rounded-md',
+        {'border-dashed': mempool}
+      )}
       onClick={() => openInNewTab(data.txid, wallet)}
     >
       <p>{amount}</p>
@@ -40,6 +44,9 @@ export default function TransactionsList({ short }: { short?: boolean }) {
         {reloading ? <Label text='Reloading...' pulse /> : <Label text={`Up to date at height ${wallet.scannedBlockHeight[wallet.network]}`} />}
       </div>
       <div className='flex flex-col gap-2 h-72 overflow-auto'>
+        {wallet.mempoolTransactions[wallet.network].map((t) => (
+          <TransactionLine key={`${t.amount} ${t.txid}`} data={t} wallet={wallet} mempool />
+        ))}
         {showTxs.map((t) => (
           <TransactionLine key={`${t.amount} ${t.txid}`} data={t} wallet={wallet} />
         ))}

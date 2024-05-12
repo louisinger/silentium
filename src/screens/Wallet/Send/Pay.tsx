@@ -9,7 +9,7 @@ import Container from '../../../components/Container'
 import NeedsPassword from '../../../components/NeedsPassword'
 import { prettyNumber } from '../../../lib/format'
 import { WalletContext } from '../../../providers/wallet'
-import { sendSats } from '../../../lib/transactions'
+import { sendSats, sendSatsResult } from '../../../lib/transactions'
 import Error from '../../../components/Error'
 import Loading from '../../../components/Loading'
 import { notify } from '../../../components/Toast'
@@ -20,24 +20,23 @@ import { getRestApiExplorerURL } from '../../../lib/explorers'
 export default function SendPayment() {
   const { navigate } = useContext(NavigationContext)
   const { sendInfo, setSendInfo } = useContext(FlowContext)
-  const { wallet } = useContext(WalletContext)
+  const { wallet, pushMempoolTransaction } = useContext(WalletContext)
 
   const [error, setError] = useState('')
 
   const { total } = sendInfo
 
-  const onTx = async (txhex: string) => {
-    if (!txhex) {
+  const onTx = async ({ hex, newUtxos, selectedCoins }: sendSatsResult) => {
+    if (!hex) {
       return setError('Error broadcasting transaction')
     }
 
-    const chainSrc = new EsploraChainSource(
-      getRestApiExplorerURL(wallet)
-    )
+    const chainSrc = new EsploraChainSource(getRestApiExplorerURL(wallet))
 
-    const txid = await chainSrc.broadcast(txhex)
+    const txid = await chainSrc.broadcast(hex)
 
     setSendInfo({ ...sendInfo, txid })
+    pushMempoolTransaction(selectedCoins, newUtxos, txid)
     navigate(Pages.SendSuccess)
   }
 
@@ -68,7 +67,7 @@ export default function SendPayment() {
       <ButtonsOnBottom>
         <Button onClick={goBackToWallet} label='Back to wallet' secondary />
       </ButtonsOnBottom>
-      <NeedsPassword title="Pay" onClose={goBackToWallet} onMnemonic={onMnemonic} />
+      <NeedsPassword title='Pay' onClose={goBackToWallet} onMnemonic={onMnemonic} />
     </Container>
   )
 }

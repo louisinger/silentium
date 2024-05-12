@@ -18,6 +18,7 @@ import Select from '../../../components/Select'
 import { notify } from '../../../components/Toast'
 import { AxiosError } from 'axios'
 import Option from '../../../components/Option'
+import { NetworkName } from '../../../lib/network'
 
 export default function SendFees() {
   const { wallet } = useContext(WalletContext)
@@ -52,6 +53,12 @@ export default function SendFees() {
 
   useEffect(() => {
     if (rates) return
+    if (wallet.network === NetworkName.Regtest) {
+      setRates({ fastest: 2, halfHour: 3, hour: 4, day: 5 })
+      setFeeRate(2)
+      return
+    }
+
     const chainSrc = new EsploraChainSource(getRestApiExplorerURL(wallet))
     chainSrc.getFeeRates().then((rates) => {
       setRates(rates)

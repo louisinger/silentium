@@ -8,8 +8,10 @@ export const feeForCoins = (numInputs: number, numOutputs: number, feeRate: numb
 
 export const feesToSendSats = (sats: number, wallet: Wallet, feeRate: number): number => {
   if (sats === 0) return 0
-  console.log('rate', feeRate)
-  const { coins, changeAmount } = selectCoins(sats, wallet.utxos[wallet.network], feeRate)
+  const { coins, changeAmount } = selectCoins(sats, 
+    wallet.utxos[wallet.network], 
+    feeRate
+  )
 
   return feeForCoins(coins.length, changeAmount > 0 ? 2 : 1, feeRate)
 }
