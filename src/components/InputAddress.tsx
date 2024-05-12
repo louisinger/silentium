@@ -13,8 +13,6 @@ export default function InputAddress({ label, onChange }: InputAmountProps) {
   function validateAddress(address: string) {
     if (address.length < 26) {
       setError('Address too short')
-    } else if (address.length > 35) {
-      setError('Address too long')
     } else {
       setError('')
     }
