@@ -72,7 +72,7 @@ export default function InitOld() {
     }
 
     const mnemonic = passphrase.join(' ')
-    setInitInfo({ mnemonic, restoreFrom: birthHeight, network: network as NetworkName})
+    setInitInfo({ mnemonic, restoreFrom: birthHeight, network: network as NetworkName })
     navigate(Pages.InitPassword)
   }
 
@@ -87,8 +87,7 @@ export default function InitOld() {
             <Error error={label === ButtonLabel.Invalid} text={label} />
             <Columns>
               {[...passphrase].map((word, i) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <Word key={i} label={i + 1} onChange={(e: any) => handleChange(e, i)} text={word} />
+                <Word key={word} left={i + 1} onChange={(e: any) => handleChange(e, i)} text={word} />
               ))}
             </Columns>
           </div>
