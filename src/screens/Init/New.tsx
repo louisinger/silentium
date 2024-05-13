@@ -31,7 +31,7 @@ export default function InitNew() {
         <p className='p-2' />
         <Columns>
           {mnemonic.split(' ').map((word, i) => (
-            <Word key={word} label={i + 1} text={word} />
+            <Word key={word} left={i + 1} text={word} />
           ))}
         </Columns>
       </Content>
