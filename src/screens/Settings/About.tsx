@@ -13,7 +13,6 @@ export default function About() {
       <Content>
         <Title text='About' />
         <div className='flex flex-col gap-5 justify-center'>
-          <img src='/logo.svg' alt='Logo' className='w-24 h-32 mx-auto' />
           <p>
             <a className='text-primary cursor-pointer' href='https://github.com/louisinger/silentium'>
               Silentium

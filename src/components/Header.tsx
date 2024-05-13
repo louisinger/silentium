@@ -1,5 +1,4 @@
 import { useContext } from 'react'
-import LogoIcon from '../icons/Logo'
 import SettingsIcon from '../icons/Settings'
 import { ConfigContext } from '../providers/config'
 import { NavigationContext, Pages } from '../providers/navigation'
@@ -7,6 +6,7 @@ import { WalletContext } from '../providers/wallet'
 import { NetworkName } from '../lib/network'
 import { isInitialized } from '../lib/wallet'
 import { Toaster } from 'react-hot-toast'
+import SilentIcon from '../icons/Silent'
 
 const Testnet = () => (
   <div className='flex items-center'>
@@ -28,9 +28,9 @@ export default function Header() {
       <button
         onClick={handleClick}
         aria-label='Back to homepage'
-        className={(reloading ? 'animate-pulse ' : '') + 'p-2 rounded-full bg-gray-100 dark:bg-white'}
+        className={(reloading ? 'animate-pulse ' : '') + 'p-2 rounded-full bg-gray-100 dark:bg-gray-800'}
       >
-        <LogoIcon />
+        <SilentIcon />
       </button>
       {wallet.network === NetworkName.Testnet ? <Testnet /> : null}
       <button onClick={toggleShowConfig} className='p-2 rounded-full bg-gray-100 dark:bg-gray-800'>
