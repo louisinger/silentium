@@ -26,7 +26,7 @@ const defaultWallet: Wallet = {
   explorer: defaultExplorer,
   network: defaultNetwork,
   silentiumURL: {
-    [NetworkName.Mainnet]: 'https://mainnet.silentium.dev/v1',
+    [NetworkName.Mainnet]: 'https://bitcoin.silentium.dev/v1',
     [NetworkName.Testnet]: '',
     [NetworkName.Regtest]: 'http://localhost:9000/v1',
   },
