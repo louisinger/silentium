@@ -2,7 +2,7 @@ import Decimal from 'decimal.js'
 import { selectCoins } from './coinSelection'
 import { Wallet } from '../providers/wallet'
 
-const vbyteSize = (numInputs: number, numOutputs: number) => numInputs * 57.5 + numOutputs * 43
+const vbyteSize = (numInputs: number, numOutputs: number) => (numInputs * 57.5 + numOutputs * 43) + 10.5
 
 export const feeForCoins = (numInputs: number, numOutputs: number, feeRate: number) => Decimal.ceil(Decimal.mul(vbyteSize(numInputs, numOutputs), feeRate)).toNumber()
 
