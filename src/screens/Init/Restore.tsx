@@ -87,7 +87,7 @@ export default function InitOld() {
             <Error error={label === ButtonLabel.Invalid} text={label} />
             <Columns>
               {[...passphrase].map((word, i) => (
-                <Word key={word} left={i + 1} onChange={(e: any) => handleChange(e, i)} text={word} />
+                <Word key={'word' + i.toString()} left={i + 1} onChange={(e: any) => handleChange(e, i)} text={word} />
               ))}
             </Columns>
           </div>
