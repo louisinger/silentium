@@ -126,8 +126,9 @@ export const selectCoins = (amount: number, utxos: Utxo[], feeRate: number): Coi
     sats = sats - changeAmount // changeAmount is negative or 0
     coins = sortAndSelect(sats, utxos)
     value = coins.reduce((prev, curr) => prev + curr.value, 0)
-    changeAmount = value - sats - txfee
+    changeAmount = value - amount
     txfee = feeForCoins(coins.length, changeAmount > 0 ? 2 : 1, feeRate)
+    changeAmount -= txfee
     numAttempts -= 1
   } while (changeAmount < 0 && numAttempts > 0)
 
