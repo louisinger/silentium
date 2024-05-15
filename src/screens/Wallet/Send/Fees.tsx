@@ -94,7 +94,7 @@ export default function SendFees() {
           <Table
             data={[
               ['Amount', prettyNumber(satoshis)],
-              ['Transaction fees', prettyNumber(sendInfo.coinSelection?.amount)],
+              ['Transaction fees', prettyNumber(sendInfo.coinSelection?.txfee)],
               ['Total', prettyNumber(totalNeeded)],
             ]}
           />

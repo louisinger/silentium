@@ -15,7 +15,7 @@ export default function About() {
         <div className='flex flex-col gap-5 justify-center'>
           <p>
             <a className='text-primary cursor-pointer' href='https://github.com/louisinger/silentium'>
-              Silentium v0.0.1
+              Silentium v0.0.2
             </a>{' '}
             by{' '}
             <a className='text-primary cursor-pointer' href='https://github.com/louisinger'>
