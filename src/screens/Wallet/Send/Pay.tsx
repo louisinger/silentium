@@ -26,7 +26,7 @@ export default function SendPayment() {
 
   const { total } = sendInfo
 
-  const onTx = async ({ hex, newUtxos, selectedCoins }: sendSatsResult) => {
+  const onTx = async ({ hex, newUtxos }: sendSatsResult) => {
     if (!hex) {
       return setError('Error broadcasting transaction')
     }
@@ -36,7 +36,7 @@ export default function SendPayment() {
     const txid = await chainSrc.broadcast(hex)
 
     setSendInfo({ ...sendInfo, txid })
-    pushMempoolTransaction(selectedCoins, newUtxos, txid)
+    pushMempoolTransaction(sendInfo.coinSelection?.coins!, newUtxos, txid)
     navigate(Pages.SendSuccess)
   }
 
@@ -48,8 +48,8 @@ export default function SendPayment() {
   const onMnemonic = (mnemonic: string) => {
     if (!mnemonic) return
 
-    if (sendInfo.address && sendInfo.total && sendInfo.txFees) {
-      sendSats(sendInfo.total, sendInfo.address, wallet, mnemonic, sendInfo.txFees.rate)
+    if (sendInfo.address && sendInfo.total && sendInfo.coinSelection) {
+      sendSats(sendInfo.address, sendInfo.coinSelection, wallet, mnemonic)
         .then(onTx)
         .catch((e) => {
           console.error(e)

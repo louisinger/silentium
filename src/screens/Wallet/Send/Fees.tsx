@@ -11,7 +11,6 @@ import { WalletContext } from '../../../providers/wallet'
 import Error from '../../../components/Error'
 import Table from '../../../components/Table'
 import { getBalance } from '../../../lib/wallet'
-import { feesToSendSats } from '../../../lib/fees'
 import { EsploraChainSource } from '../../../lib/chainsource'
 import { getRestApiExplorerURL } from '../../../lib/explorers'
 import Select from '../../../components/Select'
@@ -19,6 +18,7 @@ import { notify } from '../../../components/Toast'
 import { AxiosError } from 'axios'
 import Option from '../../../components/Option'
 import { NetworkName } from '../../../lib/network'
+import { selectCoins } from '../../../lib/coinSelection'
 
 export default function SendFees() {
   const { wallet } = useContext(WalletContext)
@@ -28,7 +28,7 @@ export default function SendFees() {
   const [feeRate, setFeeRate] = useState<number>()
   const [rates, setRates] = useState<{ fastest: number; halfHour: number; hour: number; day: number }>()
   const [totalNeeded, setTotalNeeded] = useState<number>(
-    sendInfo.satoshis! + (sendInfo.txFees ? sendInfo.txFees?.amount : 0),
+    sendInfo.satoshis! + (sendInfo.coinSelection?.txfee ? sendInfo.coinSelection.txfee : 0),
   )
 
   const { address, satoshis } = sendInfo
@@ -36,9 +36,13 @@ export default function SendFees() {
   useEffect(() => {
     if (satoshis) {
       if (address && feeRate) {
-        const fees = feesToSendSats(satoshis, wallet, feeRate)
-        setSendInfo({ ...sendInfo, address, txFees: { amount: fees, rate: feeRate }, total: satoshis })
-        setTotalNeeded(satoshis + fees)
+        const selection = selectCoins(satoshis, 
+          wallet.utxos[wallet.network], 
+          feeRate
+        )
+
+        setSendInfo({ ...sendInfo, address, coinSelection: selection, total: satoshis })
+        setTotalNeeded(satoshis + selection.txfee)
         return
       }
     }
@@ -90,7 +94,7 @@ export default function SendFees() {
           <Table
             data={[
               ['Amount', prettyNumber(satoshis)],
-              ['Transaction fees', prettyNumber(sendInfo.txFees?.amount)],
+              ['Transaction fees', prettyNumber(sendInfo.coinSelection?.amount)],
               ['Total', prettyNumber(totalNeeded)],
             ]}
           />

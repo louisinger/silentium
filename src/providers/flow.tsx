@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useState } from 'react'
 import { NetworkName } from '../lib/network'
+import { CoinsSelected } from '../lib/coinSelection'
 
 export interface InitInfo {
   mnemonic: string
@@ -11,8 +12,8 @@ export type SendInfo = {
   address?: string
   total?: number
   satoshis?: number
-  txFees?: { amount: number; rate: number }
   txid?: string
+  coinSelection?: CoinsSelected
 }
 
 interface FlowContextProps {
