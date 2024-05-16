@@ -8,10 +8,14 @@ interface ButtonProps {
   onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   secondary?: boolean
   progress?: number
+  iconBtn?: boolean
 }
 
-export default function Button({ disabled, icon, label, onClick, secondary, progress }: ButtonProps) {
-  const contentClass = classNames('flex justify-center items-center mx-8 py-3')
+export default function Button({ disabled, icon, label, onClick, secondary, progress, iconBtn }: ButtonProps) {
+  const contentClass = classNames('flex justify-center items-center', {
+    'mx-8 py-3': !iconBtn,
+    'ml-2': iconBtn,
+  })
 
   const fillerClass = classNames('z-2 relative bg-primary h-2 rounded-md w-full transition-all duration-300 ease-in-out mb-0', {
     'animate-pulse': progress !== undefined,
@@ -20,10 +24,11 @@ export default function Button({ disabled, icon, label, onClick, secondary, prog
   return (
       <button
         className={classNames(
-          'mt-0 font-semibold rounded-md w-full disabled:opacity-50 border hover:shadow-sm',
-          { 'bg-gray dark:bg-gray-800 text-blue dark:text-gray-100 border-gray-200 dark:border-gray-700': secondary },
+          'mt-0 font-semibold rounded-md w-full disabled:opacity-40 disabled:border-none border hover:shadow-sm',
+          { 'bg-gray dark:bg-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700': secondary },
           { 'bg-gray-900 text-primary border-gray-200 dark:border-primary': !secondary },
           { 'cursor-not-allowed': disabled },
+          { 'w-14 h-12 border-none dark:text-gray-100': iconBtn }
         )}
         disabled={disabled}
         onClick={onClick}
@@ -32,7 +37,7 @@ export default function Button({ disabled, icon, label, onClick, secondary, prog
       {progress !== undefined && <div className={fillerClass} style={{ width: `${progress}%` }} />}
         <div className={contentClass}>
           {icon ?? null}
-          {label}
+          {!iconBtn && label}
         </div>
       </button>
   )

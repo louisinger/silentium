@@ -44,6 +44,8 @@ export default function SendAmount() {
     }
   }
 
+  const proceedEnabled = Boolean(!error && sendInfo.address && amount)
+
   return (
     <Container>
       <Content>
@@ -54,7 +56,7 @@ export default function SendAmount() {
         </div>
       </Content>
       <ButtonsOnBottom>
-        <Button onClick={handleProceed} label={error ? error : 'Proceed'} />
+        <Button disabled={!proceedEnabled} onClick={handleProceed} label={error ? error : 'Proceed'} />
         <Button onClick={handleCancel} label='Cancel' secondary />
       </ButtonsOnBottom>
     </Container>

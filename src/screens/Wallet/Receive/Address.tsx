@@ -23,7 +23,6 @@ export default function ReceiveSuccess() {
   const [type, setType] = useState<AddressType>(AddressType.Silent)
   const [address, setAddress] = useState(getSilentPaymentAddress(wallet))
   const [copied, setCopied] = useState(false)
-  const [showQR, setShowQR] = useState(false)
 
   const switchType = () => {
     setType(type === AddressType.Silent ? AddressType.Classic : AddressType.Silent)
@@ -51,23 +50,23 @@ export default function ReceiveSuccess() {
     <Container>
       <Content>
         <Title text='Receive' subtext={addressType()} />
-        <div className='flex flex-col h-32 mt-6' onClick={() => setShowQR((v) => !v)}>
-          { showQR ?
-            <div className='m-auto'>
+        <div className='flex flex-col h-32 mt-6'>
+          <div className='m-auto'>
             <QrCode value={address} />
           </div>
-          :
           <p
-            className='text-sm text-gray-500 dark:text-gray-400 mt-2'
+            className='text-md sm:text-sm text-gray-500 dark:text-gray-200 mt-2'
             style={{ maxWidth: '90vw', wordWrap: 'break-word' }}
           >
-            {address}
+            {address.substring(0, 5)}<b>{address.substring(5, 13)}</b>{address.substring(13, address.length-8)}<b>{address.substring(address.length-8)}</b>
           </p>
-          }
         </div>
       </Content>
       <ButtonsOnBottom>
-        <Button onClick={switchType} label={`Switch to ${type === AddressType.Silent ? 'classic' : 'silent'} address`}/>
+        <Button
+          onClick={switchType}
+          label={`Switch to ${type === AddressType.Silent ? 'classic' : 'silent'} address`}
+        />
         <Button onClick={copyAddress} label={copied ? 'Copied' : 'Copy to clipboard'} />
         <Button onClick={goBackToWallet} label='Back to wallet' secondary />
       </ButtonsOnBottom>
