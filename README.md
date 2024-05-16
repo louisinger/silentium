@@ -2,6 +2,8 @@
 
 Self-custodial & privacy focused wallet for sending and receiving Silent payments with [Silentiumd](https://github.com/louisinger/silentiumd).
 
+> **This is an experimental project acting as a proof of concept for Silent Payments light wallets. Use at your own risk.**
+
 <p align="center">
     <a href="https://app.silentium.dev">app.silentium.dev</a>
 </p>
