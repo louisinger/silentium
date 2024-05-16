@@ -5,7 +5,7 @@ type BarCodeScannerModalProps = BarcodeScannerProps & { open: boolean, onClose: 
 
 export default function BarcodeScannerModal(props: BarCodeScannerModalProps) {
   return (
-    <Modal title='Scan Recipient' open={props.open} onClose={props.onClose}>
+    <Modal withoutBorder title='' open={props.open} onClose={props.onClose}>
       { props.open ? <BarcodeScanner {...props} /> : null }
     </Modal>
   )

@@ -28,7 +28,7 @@ export default function Button({ disabled, icon, label, onClick, secondary, prog
           { 'bg-gray dark:bg-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-700': secondary },
           { 'bg-gray-900 text-primary border-gray-200 dark:border-primary': !secondary },
           { 'cursor-not-allowed': disabled },
-          { 'w-[54px] h-10 border-none dark:text-gray-100': iconBtn }
+          { 'h-12 w-12 border-none dark:text-gray-100': iconBtn }
         )}
         disabled={disabled}
         onClick={onClick}
