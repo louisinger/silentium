@@ -5,7 +5,7 @@ import Title from '../../components/Title'
 import ButtonsOnBottom from '../../components/ButtonsOnBottom'
 import Columns from '../../components/Columns'
 import Word from '../../components/Word'
-import Error from '../../components/Error'
+import ErrorBox from '../../components/Error'
 import { NavigationContext, Pages } from '../../providers/navigation'
 import Content from '../../components/Content'
 import { FlowContext } from '../../providers/flow'
@@ -84,7 +84,7 @@ export default function InitOld() {
         <Title text='Restore wallet' subtext='Insert your secret words' />
         {step === Step.Passphrase ? (
           <div className='flex flex-col gap-2 align-middle justify-center'>
-            <Error error={label === ButtonLabel.Invalid} text={label} />
+            <ErrorBox error={label === ButtonLabel.Invalid} text={label} />
             <Columns>
               {[...passphrase].map((word, i) => (
                 <Word key={'word' + i.toString()} left={i + 1} onChange={(e: any) => handleChange(e, i)} text={word} />

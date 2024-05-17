@@ -9,7 +9,7 @@ import ButtonsOnBottom from '../../../components/ButtonsOnBottom'
 import PaymentDetails, { PaymentDetailsProps } from '../../../components/PaymentDetails'
 import { getBalance } from '../../../lib/wallet'
 import { WalletContext } from '../../../providers/wallet'
-import Error from '../../../components/Error'
+import ErrorBox from '../../../components/Error'
 
 export default function SendDetails() {
   const { navigate } = useContext(NavigationContext)
@@ -47,7 +47,7 @@ export default function SendDetails() {
       <Content>
         <Title text='Payment details' />
         <div className='flex flex-col gap-2'>
-          <Error error={Boolean(error)} text={error} />
+          <ErrorBox error={Boolean(error)} text={error} />
           <PaymentDetails details={details} />
         </div>
       </Content>

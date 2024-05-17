@@ -8,7 +8,7 @@ import Container from '../../../components/Container'
 import { FlowContext } from '../../../providers/flow'
 import { prettyNumber } from '../../../lib/format'
 import { WalletContext } from '../../../providers/wallet'
-import Error from '../../../components/Error'
+import ErrorBox from '../../../components/Error'
 import Table from '../../../components/Table'
 import { getBalance } from '../../../lib/wallet'
 import { EsploraChainSource } from '../../../lib/chainsource'
@@ -19,8 +19,7 @@ import { AxiosError } from 'axios'
 import Option from '../../../components/Option'
 import { NetworkName } from '../../../lib/network'
 import { selectCoins } from '../../../lib/coinSelection'
-import { feeForOneUtxo } from '../../../lib/fees'
-import { extractError } from '../../../lib/error'
+import Balance from '../../../components/Balance'
 
 export default function SendFees() {
   const { wallet } = useContext(WalletContext)
@@ -38,24 +37,20 @@ export default function SendFees() {
   useEffect(() => {
     if (satoshis && address && feeRate) {
       try {
-        const costForOneUtxo = feeForOneUtxo(feeRate)
-        const utxos = wallet.utxos[wallet.network].filter((u) => u.value > costForOneUtxo)
-        if (utxos.length === 0) {
-          setError(`fees per coin is ${costForOneUtxo} sats, you don't have utxos exceeding that value`)
-          setTotalNeeded(NaN)
-          setSendInfo({ ...sendInfo, address, coinSelection: undefined, total: 0 })
-          return
-        }
-        const selection = selectCoins(satoshis, utxos, feeRate)
+        const selection = selectCoins(satoshis, wallet.utxos[wallet.network], feeRate)
+
+        if (selection.coins.length === 0) throw new Error('Insufficient funds')
 
         setSendInfo({ ...sendInfo, address, coinSelection: selection, total: satoshis })
         setTotalNeeded(satoshis + selection.txfee)
         if (getBalance(wallet) < satoshis + selection.txfee)
           setError(`Insufficient funds, you just have ${prettyNumber(getBalance(wallet))} sats`)
         else setError('')
-        return
-      } catch (e) {
-        setError(extractError(e))
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          setError(e.message)
+        }
+        console.error(e)
       }
     }
   }, [address, feeRate])
@@ -96,9 +91,12 @@ export default function SendFees() {
   return (
     <Container>
       <Content>
+        <Balance value={getBalance(wallet)} />
+        <hr className='my-4' />
+
         <Title text='Payment fees' subtext={`You pay ${prettyNumber(totalNeeded)} sats`} />
         <div className='flex flex-col gap-2'>
-          <Error error={Boolean(error)} text={error} />
+          <ErrorBox error={Boolean(error)} text={error} />
           <Table
             data={[
               ['Amount', prettyNumber(satoshis)],

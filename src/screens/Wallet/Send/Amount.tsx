@@ -10,6 +10,8 @@ import Container from '../../../components/Container'
 import { WalletContext } from '../../../providers/wallet'
 import { getBalance } from '../../../lib/wallet'
 import InputAddress from '../../../components/InputAddress'
+import Balance from '../../../components/Balance'
+import { DUST_AMOUNT } from '../../../lib/coinSelection'
 
 export default function SendAmount() {
   const { wallet } = useContext(WalletContext)
@@ -25,6 +27,10 @@ export default function SendAmount() {
 
     if (value.toString().length <= 0 || value === 0) return
     const balance = getBalance(wallet)
+    if (value < DUST_AMOUNT) {
+      setError('amount is too low')
+    }
+
     if (value >= balance) {
       setError('not enough funds')
       return
@@ -49,6 +55,8 @@ export default function SendAmount() {
   return (
     <Container>
       <Content>
+        <Balance value={getBalance(wallet)} />
+        <hr className='my-4' />
         <Title text='Send' />
         <div className='flex flex-col gap-2'>
           <InputAddress label='Address' onChange={(address) => setSendInfo({ ...sendInfo, address })} />

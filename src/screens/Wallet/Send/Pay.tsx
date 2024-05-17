@@ -10,7 +10,7 @@ import NeedsPassword from '../../../components/NeedsPassword'
 import { prettyNumber } from '../../../lib/format'
 import { WalletContext } from '../../../providers/wallet'
 import { sendSats, sendSatsResult } from '../../../lib/transactions'
-import Error from '../../../components/Error'
+import ErrorBox from '../../../components/Error'
 import Loading from '../../../components/Loading'
 import { notify } from '../../../components/Toast'
 import { extractError } from '../../../lib/error'
@@ -62,7 +62,7 @@ export default function SendPayment() {
     <Container>
       <Content>
         <Title text='Pay' subtext={`Paying ${prettyNumber(total ?? 0)} sats`} />
-        {error ? <Error error={Boolean(error)} text={error} /> : <Loading />}
+        {error ? <ErrorBox error={Boolean(error)} text={error} /> : <Loading />}
       </Content>
       <ButtonsOnBottom>
         <Button onClick={goBackToWallet} label='Back to wallet' secondary />

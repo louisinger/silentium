@@ -96,9 +96,7 @@ const branchAndBoundStrategy = (target: number, coins: Utxo[]): Utxo[] | undefin
 
 // select coins for given amount, with respective blinding private key
 function sortAndSelect(amount: number, utxos: Utxo[]): Utxo[] {
-  // sort utxos in descending order of value will decrease number of inputs
-  // (and fees) but will increase utxo fragmentation
-  const sortedUtxos = utxos.sort((a, b) => utxoValue(b) - utxoValue(a))
+  const sortedUtxos = utxos.sort((a, b) => utxoValue(a) - utxoValue(b))
   // try to find a combination with exact value (aka no change) first
   return branchAndBoundStrategy(amount, sortedUtxos) ?? accumulativeStrategy(amount, sortedUtxos)
 }
@@ -109,6 +107,8 @@ export interface CoinsSelected {
   coins: Utxo[]
   txfee: number
 }
+
+export const DUST_AMOUNT = 450
 
 export const selectCoins = (amount: number, utxos: Utxo[], feeRate: number): CoinsSelected => {
   // find best coins combo to pay this amount
@@ -123,14 +123,24 @@ export const selectCoins = (amount: number, utxos: Utxo[], feeRate: number): Coi
   if (balance === sats + txfee) return { amount, changeAmount, coins, txfee }
 
   do {
-    sats = sats - changeAmount // changeAmount is negative or 0
+    if (changeAmount > 0) {
+      sats = sats + (DUST_AMOUNT - changeAmount)
+    } else {
+      sats = sats - changeAmount // changeAmount is negative or 0
+    }
     coins = sortAndSelect(sats, utxos)
     value = coins.reduce((prev, curr) => prev + curr.value, 0)
     changeAmount = value - sats
     txfee = feeForCoins(coins.length, changeAmount > 0 ? 2 : 1, feeRate)
     changeAmount -= txfee
     numAttempts -= 1
-  } while (changeAmount < 0 && numAttempts > 0)
+    console.log('[coinselect]', 'utxos', coins.length, value, 'sats', sats, 'changeAmount', changeAmount, 'txfee', txfee, 'numAttempts', numAttempts)
+  } while (changeAmount <= DUST_AMOUNT && numAttempts > 0 && coins.length < utxos.length)
+
+  if (changeAmount > 0 && changeAmount <= DUST_AMOUNT) {
+    txfee += changeAmount
+    changeAmount = 0
+  }
 
   return { amount, changeAmount, coins, txfee }
 }

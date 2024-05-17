@@ -4,7 +4,7 @@ import Button from './Button'
 import { readMnemonicFromStorage } from '../lib/storage'
 import Modal from './Modal'
 import LoadingIcon from '../icons/Loading'
-import Error from './Error'
+import ErrorBox from './Error'
 import UnlockIcon from '../icons/Unlock'
 
 interface NeedsPasswordProps {
@@ -57,7 +57,7 @@ export default function NeedsPassword({ title, onClose, onMnemonic }: NeedsPassw
         <LoadingIcon small />
       ) : (
         <div className='flex flex-col gap-4'>
-          <Error error={Boolean(error)} text={error} />
+          <ErrorBox error={Boolean(error)} text={error} />
           <Input label='Password' onChange={handleChange} type='password' />
           <Button icon={<UnlockIcon/>} label='Unlock' secondary onClick={handleProceed} disabled={disabled} />
         </div>

@@ -116,9 +116,14 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     }
 
     if (wallet.scannedBlockHeight[networkName] === -1) {
-      const explorer = new EsploraChainSource(getRestApiExplorerURL(clone))
-      const height = await explorer.getChainTipHeight()
-      clone.scannedBlockHeight[networkName] = height
+      try {
+        const explorer = new EsploraChainSource(getRestApiExplorerURL(clone))
+        const height = await explorer.getChainTipHeight()
+        clone.scannedBlockHeight[networkName] = height
+      } catch (e) {
+        notify(extractErrorMessage(e))
+        clone.scannedBlockHeight[networkName] = 0
+      }
     }
 
     setWallet(clone)
