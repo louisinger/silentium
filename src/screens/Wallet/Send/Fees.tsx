@@ -34,26 +34,16 @@ export default function SendFees() {
   const { address, satoshis } = sendInfo
 
   useEffect(() => {
-    if (satoshis) {
-      if (address && feeRate) {
-        const selection = selectCoins(satoshis, 
-          wallet.utxos[wallet.network], 
-          feeRate
-        )
+    if (satoshis && address && feeRate) {
+      const selection = selectCoins(satoshis, wallet.utxos[wallet.network], feeRate)
 
-        setSendInfo({ ...sendInfo, address, coinSelection: selection, total: satoshis })
-        setTotalNeeded(satoshis + selection.txfee)
-        return
-      }
-    }
-  }, [address, feeRate])
-
-  useEffect(() => {
-    if (sendInfo.total) {
+      setSendInfo({ ...sendInfo, address, coinSelection: selection, total: satoshis })
+      setTotalNeeded(satoshis + selection.txfee)
       if (getBalance(wallet) < totalNeeded)
         setError(`Insufficient funds, you just have ${prettyNumber(getBalance(wallet))} sats`)
+      return
     }
-  }, [sendInfo.total])
+  }, [address, feeRate])
 
   useEffect(() => {
     if (rates) return
@@ -64,16 +54,19 @@ export default function SendFees() {
     }
 
     const chainSrc = new EsploraChainSource(getRestApiExplorerURL(wallet))
-    chainSrc.getFeeRates().then((rates) => {
-      setRates(rates)
-      setFeeRate(rates.fastest)
-    }).catch((e) => {
-      console.error(e)
-      if (e instanceof AxiosError) {
-        setError('fee rates: ' + e.message)
-      }
-      notify('Error fetching fee rates')
-    })
+    chainSrc
+      .getFeeRates()
+      .then((rates) => {
+        setRates(rates)
+        setFeeRate(rates.fastest)
+      })
+      .catch((e) => {
+        console.error(e)
+        if (e instanceof AxiosError) {
+          setError('fee rates: ' + e.message)
+        }
+        notify('Error fetching fee rates')
+      })
   }, [])
 
   const handleCancel = () => {
@@ -98,12 +91,14 @@ export default function SendFees() {
               ['Total', prettyNumber(totalNeeded)],
             ]}
           />
-          {feeRate && rates ? <Select label='Fee rate' value={feeRate} onChange={(e) => setFeeRate(e.target.value)}>
+          {feeRate && rates ? (
+            <Select label='Fee rate' value={feeRate} onChange={(e) => setFeeRate(e.target.value)}>
               <Option value={rates?.fastest}>{`10 mins (${prettyNumber(rates?.fastest, 1)} s/vbyte)`}</Option>
               <Option value={rates?.halfHour}>{`30 mins (${prettyNumber(rates?.halfHour, 1)} s/vbyte)`}</Option>
               <Option value={rates?.hour}>{`1 hour (${prettyNumber(rates?.hour, 1)} s/vbyte)`}</Option>
               <Option value={rates?.day}>{`1 day (${prettyNumber(rates?.day, 1)} s/vbyte)`}</Option>
-            </Select> : null}
+            </Select>
+          ) : null}
         </div>
       </Content>
       <ButtonsOnBottom>
