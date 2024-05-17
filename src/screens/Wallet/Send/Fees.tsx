@@ -20,6 +20,7 @@ import Option from '../../../components/Option'
 import { NetworkName } from '../../../lib/network'
 import { selectCoins } from '../../../lib/coinSelection'
 import { feeForOneUtxo } from '../../../lib/fees'
+import { extractError } from '../../../lib/error'
 
 export default function SendFees() {
   const { wallet } = useContext(WalletContext)
@@ -36,21 +37,26 @@ export default function SendFees() {
 
   useEffect(() => {
     if (satoshis && address && feeRate) {
-      const costForOneUtxo = feeForOneUtxo(feeRate)
-      const utxos = wallet.utxos[wallet.network].filter(u => u.value > costForOneUtxo)
-      if (utxos.length === 0) {
-        setError(`fees per coin is ${costForOneUtxo} sats, you don't have utxos exceeding that value`)
-        setTotalNeeded(NaN)
-        setSendInfo({ ...sendInfo, address, coinSelection: undefined, total: 0 })
-        return
-      }
-      const selection = selectCoins(satoshis, utxos, feeRate)
+      try {
+        const costForOneUtxo = feeForOneUtxo(feeRate)
+        const utxos = wallet.utxos[wallet.network].filter((u) => u.value > costForOneUtxo)
+        if (utxos.length === 0) {
+          setError(`fees per coin is ${costForOneUtxo} sats, you don't have utxos exceeding that value`)
+          setTotalNeeded(NaN)
+          setSendInfo({ ...sendInfo, address, coinSelection: undefined, total: 0 })
+          return
+        }
+        const selection = selectCoins(satoshis, utxos, feeRate)
 
-      setSendInfo({ ...sendInfo, address, coinSelection: selection, total: satoshis })
-      setTotalNeeded(satoshis + selection.txfee)
-      if (getBalance(wallet) < satoshis + selection.txfee) setError(`Insufficient funds, you just have ${prettyNumber(getBalance(wallet))} sats`)
-      else setError('')
-      return
+        setSendInfo({ ...sendInfo, address, coinSelection: selection, total: satoshis })
+        setTotalNeeded(satoshis + selection.txfee)
+        if (getBalance(wallet) < satoshis + selection.txfee)
+          setError(`Insufficient funds, you just have ${prettyNumber(getBalance(wallet))} sats`)
+        else setError('')
+        return
+      } catch (e) {
+        setError(extractError(e))
+      }
     }
   }, [address, feeRate])
 
