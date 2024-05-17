@@ -27,7 +27,7 @@ const defaultWallet: Wallet = {
   network: defaultNetwork,
   silentiumURL: {
     [NetworkName.Mainnet]: 'https://bitcoin.silentium.dev/v1',
-    [NetworkName.Testnet]: '',
+    [NetworkName.Testnet]: 'https://testnet.silentium.dev/v1',
     [NetworkName.Regtest]: 'http://localhost:9000/v1',
   },
   mempoolTransactions: {
@@ -90,6 +90,19 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [scanningProgress, setScanningProgress] = useState<number>()
   const [wallet, setWallet] = useStorage<Wallet>('wallet', defaultWallet)
 
+  // ensures that the testnet URL is set to the default value if it is empty
+  useEffect(() => {
+    if (wallet.silentiumURL[NetworkName.Testnet] === '') {
+      setWallet({
+        ...wallet,
+        silentiumURL: {
+          ...wallet.silentiumURL,
+          [NetworkName.Testnet]: defaultWallet.silentiumURL[NetworkName.Testnet],
+        },
+      })
+    }
+  }, [wallet])
+
   const changeExplorer = async (explorer: ExplorerName) => {
     const clone = { ...wallet, explorer }
     setWallet(clone)
@@ -150,9 +163,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       for (let i = wallet.scannedBlockHeight[wallet.network] + 1; i <= chainTip; i++) {
         try {
           const updateResult = await updater.updateHeight(
-            i, 
-            wallet.utxos[wallet.network], 
-            wallet.mempoolTransactions[wallet.network]
+            i,
+            wallet.utxos[wallet.network],
+            wallet.mempoolTransactions[wallet.network],
           )
           wallet = {
             ...applyUpdate(wallet, updateResult),
@@ -192,7 +205,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     for (const coin of newUtxos) {
       tx.amount += coin.value
     }
-    
+
     const w: Wallet = {
       ...applyUpdate(wallet, {
         newUtxos: newUtxos,
@@ -201,10 +214,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       }),
       mempoolTransactions: {
         ...wallet.mempoolTransactions,
-        [wallet.network]: [
-          ...wallet.mempoolTransactions[wallet.network], 
-          tx
-        ],
+        [wallet.network]: [...wallet.mempoolTransactions[wallet.network], tx],
       },
     }
 

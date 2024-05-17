@@ -8,9 +8,10 @@ interface InputProps {
   placeholder?: string
   right?: string
   type?: string
+  value?: string
 }
 
-export default function Input({ label, left, onChange, placeholder, right, type }: InputProps) {
+export default function Input({ label, left, onChange, placeholder, right, type, value }: InputProps) {
   const commonSidesClassName = 'w-16 pt-3 mx-auto text-sm bg-gray-700 dark:bg-gray-200 text-gray-100 dark:text-gray-800'
 
   return (
@@ -18,11 +19,17 @@ export default function Input({ label, left, onChange, placeholder, right, type 
       {label ? <Label text={label} /> : null}
       <div className='flex'>
         {left ? <p className={`${commonSidesClassName} rounded-l-md`}>{left}</p> : null}
-        <input className={classNames(
-        'w-full p-3 text-sm font-semibold bg-gray-100 dark:bg-darklessgray focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
-          { 'rounded-l-md': !left },
-          { 'rounded-r-md': !right }
-        )} onChange={onChange} placeholder={placeholder} type={type ?? 'text'} />
+        <input
+          className={classNames(
+            'w-full p-3 text-sm font-semibold bg-gray-100 dark:bg-darklessgray focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
+            { 'rounded-l-md': !left },
+            { 'rounded-r-md': !right },
+          )}
+          onChange={onChange}
+          placeholder={placeholder}
+          type={type ?? 'text'}
+          value={value}
+        />
         {right ? <p className={`${commonSidesClassName} rounded-r-md`}>{right}</p> : null}
       </div>
     </fieldset>

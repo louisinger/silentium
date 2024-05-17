@@ -27,7 +27,10 @@ export const readMnemonicFromStorage = async (password: string): Promise<string 
 
 export const useStorage = <T>(key: string, defaultValue: T): [T, (value: T) => void] => {
   const getItem = localStorage.getItem(key)
-  const initial = getItem ? { ...defaultValue, ...JSON.parse(getItem) } : defaultValue
+  const initial = getItem ? { 
+    ...defaultValue, 
+    ...JSON.parse(getItem),
+  } : defaultValue
 
   const [value, setValue] = useState<T>(initial)
 

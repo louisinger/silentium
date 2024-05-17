@@ -70,7 +70,7 @@ const getWebExplorerURL = ({ explorer, network }: Wallet): string => {
 
 export const getTxIdURL = (txid: string, wallet: Wallet) => {
   const url = getWebExplorerURL(wallet)
-  return `${url}/tx/${txid}`
+  return new URL(`/tx/${txid}`, url).toString()
 }
 
 export const openInNewTab = (txid: string, wallet: Wallet) => {

@@ -76,7 +76,7 @@ export default function InputAmount({ label, onChange }: InputAmountProps) {
           <Input type='text' placeholder='0' onChange={(e) => setAmount(e.target.value)} />
         )}
         <div className='w-16 h-full flex items-center rounded-r-md text-sm bg-gray-400 text-gray-100 dark:text-gray-800 dark:bg-darklessgray'>
-          <div className='mx-auto font-semibold'>{unit}</div>
+          <div className='mx-auto font-semibold dark:text-gray-200'>{unit}</div>
         </div>
       </div>
       <div className='flex justify-between'>

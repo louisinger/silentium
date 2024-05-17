@@ -19,6 +19,8 @@ import { AxiosError } from 'axios'
 import Option from '../../../components/Option'
 import { NetworkName } from '../../../lib/network'
 import { selectCoins } from '../../../lib/coinSelection'
+import { feeForOneUtxo } from '../../../lib/fees'
+import { extractError } from '../../../lib/error'
 
 export default function SendFees() {
   const { wallet } = useContext(WalletContext)
@@ -34,26 +36,29 @@ export default function SendFees() {
   const { address, satoshis } = sendInfo
 
   useEffect(() => {
-    if (satoshis) {
-      if (address && feeRate) {
-        const selection = selectCoins(satoshis, 
-          wallet.utxos[wallet.network], 
-          feeRate
-        )
+    if (satoshis && address && feeRate) {
+      try {
+        const costForOneUtxo = feeForOneUtxo(feeRate)
+        const utxos = wallet.utxos[wallet.network].filter((u) => u.value > costForOneUtxo)
+        if (utxos.length === 0) {
+          setError(`fees per coin is ${costForOneUtxo} sats, you don't have utxos exceeding that value`)
+          setTotalNeeded(NaN)
+          setSendInfo({ ...sendInfo, address, coinSelection: undefined, total: 0 })
+          return
+        }
+        const selection = selectCoins(satoshis, utxos, feeRate)
 
         setSendInfo({ ...sendInfo, address, coinSelection: selection, total: satoshis })
         setTotalNeeded(satoshis + selection.txfee)
+        if (getBalance(wallet) < satoshis + selection.txfee)
+          setError(`Insufficient funds, you just have ${prettyNumber(getBalance(wallet))} sats`)
+        else setError('')
         return
+      } catch (e) {
+        setError(extractError(e))
       }
     }
   }, [address, feeRate])
-
-  useEffect(() => {
-    if (sendInfo.total) {
-      if (getBalance(wallet) < totalNeeded)
-        setError(`Insufficient funds, you just have ${prettyNumber(getBalance(wallet))} sats`)
-    }
-  }, [sendInfo.total])
 
   useEffect(() => {
     if (rates) return
@@ -64,16 +69,19 @@ export default function SendFees() {
     }
 
     const chainSrc = new EsploraChainSource(getRestApiExplorerURL(wallet))
-    chainSrc.getFeeRates().then((rates) => {
-      setRates(rates)
-      setFeeRate(rates.fastest)
-    }).catch((e) => {
-      console.error(e)
-      if (e instanceof AxiosError) {
-        setError('fee rates: ' + e.message)
-      }
-      notify('Error fetching fee rates')
-    })
+    chainSrc
+      .getFeeRates()
+      .then((rates) => {
+        setRates(rates)
+        setFeeRate(rates.fastest)
+      })
+      .catch((e) => {
+        console.error(e)
+        if (e instanceof AxiosError) {
+          setError('fee rates: ' + e.message)
+        }
+        notify('Error fetching fee rates')
+      })
   }, [])
 
   const handleCancel = () => {
@@ -98,12 +106,14 @@ export default function SendFees() {
               ['Total', prettyNumber(totalNeeded)],
             ]}
           />
-          {feeRate && rates ? <Select label='Fee rate' value={feeRate} onChange={(e) => setFeeRate(e.target.value)}>
+          {feeRate && rates ? (
+            <Select label='Fee rate' value={feeRate} onChange={(e) => setFeeRate(e.target.value)}>
               <Option value={rates?.fastest}>{`10 mins (${prettyNumber(rates?.fastest, 1)} s/vbyte)`}</Option>
               <Option value={rates?.halfHour}>{`30 mins (${prettyNumber(rates?.halfHour, 1)} s/vbyte)`}</Option>
               <Option value={rates?.hour}>{`1 hour (${prettyNumber(rates?.hour, 1)} s/vbyte)`}</Option>
               <Option value={rates?.day}>{`1 day (${prettyNumber(rates?.day, 1)} s/vbyte)`}</Option>
-            </Select> : null}
+            </Select>
+          ) : null}
         </div>
       </Content>
       <ButtonsOnBottom>
