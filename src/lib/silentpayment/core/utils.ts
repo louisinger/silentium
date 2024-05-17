@@ -19,6 +19,7 @@ export const createTaggedHash = (tag: string, buffer: Buffer): Buffer => {
 }
 
 export const calculateSumOfPrivateKeys = (keys: PrivateKey[]): Buffer => {
+  if (!keys.length) throw new Error('failed to get input private keys')
   const negatedKeys = keys.map(({ isXOnly, key }) => {
     if (isXOnly && getPublicKey(key)[0] === 0x03) {
       return Buffer.from(secp.privateKeyNegate(key))
