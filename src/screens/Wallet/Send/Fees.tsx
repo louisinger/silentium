@@ -39,8 +39,8 @@ export default function SendFees() {
 
       setSendInfo({ ...sendInfo, address, coinSelection: selection, total: satoshis })
       setTotalNeeded(satoshis + selection.txfee)
-      if (getBalance(wallet) < totalNeeded)
-        setError(`Insufficient funds, you just have ${prettyNumber(getBalance(wallet))} sats`)
+      if (getBalance(wallet) < totalNeeded) setError(`Insufficient funds, you just have ${prettyNumber(getBalance(wallet))} sats`)
+      else setError('')
       return
     }
   }, [address, feeRate])
