@@ -6,6 +6,10 @@
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@boltz/bitcoin-ops": "^2.0.0",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/camera": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
     "@noble/curves": "^1.4.0",
     "@noble/secp256k1": "^2.1.0",
     "@scure/base": "^1.1.6",
@@ -63,8 +67,10 @@
     "test": "craco test",
     "lint": "eslint --ext .ts,.tsx src",
     "eject": "craco eject",
-    "predeploy" : "yarn build",
-    "deploy" : "gh-pages -d build"
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d build",
+    "cap:sync": "npx cap sync",
+    "cap:android": "npx cap copy android && npx cap open android"
   },
   "eslintConfig": {
     "extends": [
@@ -87,6 +93,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "",
     "@babel/preset-env": "^7.24.4",
+    "@capacitor/cli": "^6.0.0",
     "@craco/craco": "^7.1.0",
     "@types/secp256k1": "^4.0.6",
     "@typescript-eslint/eslint-plugin": "^4.24.0",

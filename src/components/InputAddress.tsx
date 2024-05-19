@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
+import { Capacitor } from '@capacitor/core'
+import { Camera } from '@capacitor/camera';
+
 import Label from './Label'
 import Input from './Input'
 import Button from './Button'
 import ScanIcon from '../icons/Scan'
 import BarcodeScannerModal from './BarcodeScannerModal'
 import classNames from 'classnames'
+import { notify } from './Toast'
 
 interface InputAmountProps {
   label: string
@@ -18,10 +22,29 @@ export default function InputAddress({ label, onChange }: InputAmountProps) {
   const [value, setValue] = useState('')
 
   useEffect(() => {
-    navigator.permissions.query({ name: 'camera' as PermissionName }).then((x) => {
-      if (x.state !== 'denied') setCameraAllowed(true)
-    })
-  })
+    if (Capacitor.isPluginAvailable('Camera')) {
+
+      if (Capacitor.isNativePlatform()) {
+        Camera.requestPermissions({
+          permissions: ['camera']
+        }).then((x) => {
+          setCameraAllowed(x.camera === 'granted' ? true : false)
+        })
+        .catch((e) => {
+          console.error(e)
+          notify('Camera permission denied')
+        })  
+      } else {
+        navigator.permissions.query({ name: 'camera' as PermissionName }).then((x) => {
+          setCameraAllowed(x.state !== 'denied' ? true : false)
+        })
+        .catch((e) => {
+          console.error(e)
+          notify('Camera permission denied')
+        })
+      }
+    }
+  }, [])
 
   function validateAddress(address: string) {
     if (address.length < 26) {
@@ -64,7 +87,7 @@ export default function InputAddress({ label, onChange }: InputAmountProps) {
           'col-end-13 flex items-center h-12 rounded-l-md bg-gray-10',
           { 'col-span-10': cameraAllowed },
           { 'col-span-12': !cameraAllowed }
-          )}>
+        )}>
           <Input type='text' onChange={(e) => setInputValue(e.target.value)} value={value} />
         </div>
       </div>
