@@ -1912,14 +1912,14 @@
   dependencies:
     eslint-scope "5.1.1"
 
-"@noble/curves@^1.4.0", "@noble/curves@~1.4.0":
+"@noble/curves@^1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-1.4.0.tgz#f05771ef64da724997f69ee1261b2417a49522d6"
   integrity sha512-p+4cb332SFCrReJkCYe8Xzm0OWi4Jji5jVdIZRL/PmacmDkFNw6MrrV+gGpiPxLHbV+zKFRywUWbaseT+tZRXg==
   dependencies:
     "@noble/hashes" "1.4.0"
 
-"@noble/hashes@1.4.0", "@noble/hashes@^1.1.5", "@noble/hashes@^1.2.0", "@noble/hashes@~1.4.0":
+"@noble/hashes@1.4.0", "@noble/hashes@^1.1.5", "@noble/hashes@^1.2.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.4.0.tgz#45814aa329f30e4fe0ba49426f49dfccdd066426"
   integrity sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==
@@ -2015,20 +2015,10 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.10.3.tgz#391d528054f758f81e53210f1a1eebcf1a8b1d20"
   integrity sha512-qC/xYId4NMebE6w/V33Fh9gWxLgURiNYgVNObbJl2LZv0GUUItCcCqC5axQSwRaAgaxl2mELq1rMzlswaQ0Zxg==
 
-"@scure/base@^1.1.1", "@scure/base@^1.1.6", "@scure/base@~1.1.5", "@scure/base@~1.1.6":
+"@scure/base@^1.1.1", "@scure/base@^1.1.6":
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.6.tgz#8ce5d304b436e4c84f896e0550c83e4d88cb917d"
   integrity sha512-ok9AWwhcgYuGG3Zfhyqg+zwl+Wn5uE+dwC0NV/2qQkx4dABbb/bx96vWu8NSj+BNjjSjno+JRYRjle1jV08k3g==
-
-"@scure/btc-signer@^1.3.1":
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/@scure/btc-signer/-/btc-signer-1.3.2.tgz#56cf02a2e318097b1e4f531fac8ef114bdf4ddc8"
-  integrity sha512-BmcQHvxaaShKwgbFC0vDk0xzqbMhNtNmgXm6u7cz07FNtGsVItUuHow6NbgHmc+oJSBZJRym5dz8+Uu0JoEJhQ==
-  dependencies:
-    "@noble/curves" "~1.4.0"
-    "@noble/hashes" "~1.4.0"
-    "@scure/base" "~1.1.6"
-    micro-packed "~0.6.2"
 
 "@sinclair/typebox@^0.24.1":
   version "0.24.51"
@@ -6110,9 +6100,9 @@ globby@^6.1.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
-"golomb@git+https://github.com/louisinger/golomb.git":
+"golomb@https://github.com/louisinger/golomb.git":
   version "1.2.0"
-  resolved "git+https://github.com/louisinger/golomb.git#146743bf69ee23a2c33572ec4ebf04ed1ca8d94c"
+  resolved "https://github.com/louisinger/golomb.git#146743bf69ee23a2c33572ec4ebf04ed1ca8d94c"
   dependencies:
     bcrypto "^5.5.2"
     bsert "~0.0.10"
@@ -7817,13 +7807,6 @@ methods@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/methods/-/methods-1.1.2.tgz#5529a4d67654134edcc5266656835b0f851afcee"
   integrity sha512-iclAHeNqNm68zFtnZ0e+1L2yUIdvzNoauKU4WBA3VvH/vPFieF7qfRlwUZU+DA9P9bPXIS90ulxoUoCH23sV2w==
-
-micro-packed@~0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/micro-packed/-/micro-packed-0.6.2.tgz#cc132517730b3b865a534166d6d58d8b1ee4d586"
-  integrity sha512-a1C2m0WdjZSMleMylPihztSwQSt3pd97lbk6inQgYJ+AVWJIzNfufOQo3faBztJAdvr0h9gt190H9xp+sKKJGA==
-  dependencies:
-    "@scure/base" "~1.1.5"
 
 micromatch@^4.0.2, micromatch@^4.0.4, micromatch@^4.0.5:
   version "4.0.5"
@@ -11481,6 +11464,11 @@ write-file-atomic@^3.0.0:
     is-typedarray "^1.0.0"
     signal-exit "^3.0.2"
     typedarray-to-buffer "^3.1.5"
+
+ws-browserify@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/ws-browserify/-/ws-browserify-1.0.0.tgz#2700c287e9c8381c031f17dee2baf28a623e9afc"
+  integrity sha512-3VCutqr6GrHcmnxD09UJSML3f0nMcXYYIA7447I6JNyugc7A9J97WmaUerRgpmbiPT6U92LF6hHACJsse+nYeA==
 
 ws@^7.4.6:
   version "7.5.9"
