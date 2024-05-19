@@ -17,6 +17,12 @@ import OuterContainer from './components/OuterContainer'
 import SendSuccess from './screens/Wallet/Send/Success'
 import Transactions from './screens/Wallet/Transactions'
 import SendAmount from './screens/Wallet/Send/Amount'
+import { StatusBar } from '@capacitor/status-bar'
+import { Capacitor } from '@capacitor/core'
+
+if (Capacitor.isNativePlatform()) {
+  StatusBar.hide().catch(console.error)
+}
 
 export default function App() {
   const { loading, showConfig } = useContext(ConfigContext)

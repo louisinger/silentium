@@ -10,6 +10,7 @@
     "@capacitor/camera": "^6.0.0",
     "@capacitor/core": "^6.0.0",
     "@capacitor/ios": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0",
     "@noble/curves": "^1.4.0",
     "@noble/secp256k1": "^2.1.0",
     "@scure/base": "^1.1.6",
@@ -70,7 +71,8 @@
     "predeploy": "yarn build",
     "deploy": "gh-pages -d build",
     "cap:sync": "npx cap sync",
-    "cap:android": "npx cap copy android && npx cap open android"
+    "cap:android": "npx cap copy android && npx cap open android",
+    "cap:ios": "npx cap copy ios && npx cap open ios"
   },
   "eslintConfig": {
     "extends": [
