@@ -3545,7 +3545,7 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.3.0.tgz#f6e14a97858d327252200242d4ccfe522c445522"
   integrity sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==
 
-bip158@^1.0.0:
+bip158@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/bip158/-/bip158-1.1.0.tgz#c231537f79fe4da402139e5404c3aea7b83977bd"
   integrity sha512-9Jx1qMwTeYUNCyjc846mYunLBmYgFHTx/vhKCOh2Skw7s8EMj2IuFQByLDiYgRIQYzRlBDcIEWwITuVSjMpIXw==
