@@ -48,6 +48,7 @@
     "secp256k1": "^5.0.0",
     "stream-browserify": "^3.0.0",
     "typescript": "^4.4.2",
+    "vm-browserify": "^1.1.2",
     "workbox-background-sync": "^6.4.2",
     "workbox-broadcast-update": "^6.4.2",
     "workbox-cacheable-response": "^6.4.2",
@@ -59,8 +60,7 @@
     "workbox-range-requests": "^6.4.2",
     "workbox-routing": "^6.4.2",
     "workbox-strategies": "^6.4.2",
-    "workbox-streams": "^6.4.2",
-    "ws-browserify": "^1.0.0"
+    "workbox-streams": "^6.4.2"
   },
   "scripts": {
     "start": "GENERATE_SOURCEMAP=false craco start",
