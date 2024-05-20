@@ -6,7 +6,7 @@ import { NetworkName, getNetwork } from './network'
 import { Wallet } from '../providers/wallet'
 import { deriveBIP352Keys } from './silentpayment/core/keys'
 import { encodeSilentPaymentAddress } from './silentpayment/core/encoding'
-import { initEccLib, payments } from 'bitcoinjs-lib'
+import { initEccLib, payments, crypto } from 'bitcoinjs-lib'
 
 const bip32 = BIP32Factory(ecc)
 
@@ -26,8 +26,12 @@ export async function getCoinPrivKey(coin: Utxo, network: NetworkName, mnemonic:
     return Buffer.from(tweakedKey)
   }
 
-  const { p2trPrivateKey } = getP2TRPrivateKey(masterNode, network)
-  return p2trPrivateKey
+  const { p2trPublicKey } = getP2TRPublicKey(masterNode, network)
+  if (coin.script.includes(p2trPublicKey)) {
+    return getP2TRPrivateKey(masterNode, network, false).p2trPrivateKey
+  }
+
+  return getP2TRPrivateKey(masterNode, network, true).p2trPrivateKey
 }
 
 const getSilentPaymentPublicKeys = (
@@ -44,11 +48,33 @@ const getP2TRPublicKey = (master: BIP32Interface, network: NetworkName): { p2trP
   return { p2trPublicKey: key.publicKey.toString('hex') }
 }
 
-const getP2TRPrivateKey = (master: BIP32Interface, network: NetworkName): { p2trPrivateKey: Buffer } => {
+const getP2TRPrivateKey = (master: BIP32Interface, network: NetworkName, tweaked: boolean): { p2trPrivateKey: Buffer } => {
   const coinType = network === NetworkName.Mainnet ? 0 : 1
   const key = master.deriveHardened(86).deriveHardened(coinType).deriveHardened(0).derive(0).derive(0)
   if (!key.privateKey) throw new Error('Could not derive private key')
-  return { p2trPrivateKey: key.privateKey }
+  
+  if (!tweaked) {
+    return {
+      p2trPrivateKey:  key.privateKey
+    }
+  }
+    
+  const tweak = crypto.taggedHash('TapTweak', key.publicKey.subarray(1))
+  
+  const hasOddY = key.publicKey[0] === 3 || (key.publicKey[0] === 4 && (key.publicKey[64] & 1) === 1);
+  let privKey = key.privateKey;
+  if  (hasOddY) {
+    const negated = ecc.privateNegate(privKey);
+    if (!negated) throw new Error('Could not negate private key');
+    privKey = Buffer.from(negated);
+  }
+
+            
+  const tweakedPrivateKey = ecc.privateAdd(privKey, tweak);
+  if (!tweakedPrivateKey)
+    throw new Error('Invalid tweaked private key!');
+
+  return { p2trPrivateKey: Buffer.from(tweakedPrivateKey) }
 }
 
 const getPublicKeys = (master: BIP32Interface, network: NetworkName): Keys => ({
@@ -99,7 +125,7 @@ export function getSilentPaymentAddress(wallet: Wallet): string {
 export function getP2TRAddress(wallet: Wallet): string {
   const p2tr = payments.p2tr({
     network: getNetwork(wallet.network),
-    pubkey: Buffer.from(wallet.publicKeys[wallet.network].p2trPublicKey, 'hex').slice(1),
+    internalPubkey: Buffer.from(wallet.publicKeys[wallet.network].p2trPublicKey, 'hex').subarray(1),
   })
 
   if (!p2tr.address) throw new Error('Could not generate P2TR address')

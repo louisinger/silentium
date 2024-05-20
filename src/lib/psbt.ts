@@ -95,7 +95,9 @@ export async function buildPsbt(
           script: Buffer.from(coin.script, 'hex'),
           value: coin.value,
         },
-        tapInternalKey: Buffer.from(coin.script, 'hex').slice(2),
+        tapInternalKey: coin.silentPayment
+          ? Buffer.from(coin.script, 'hex').subarray(2)
+          : Buffer.from(wallet.publicKeys[wallet.network].p2trPublicKey, 'hex').subarray(1),
       })),
     )
     .addOutputs(outputs)
