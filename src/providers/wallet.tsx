@@ -1,11 +1,11 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react'
 import { useStorage } from '../lib/storage'
 import { NavigationContext, Pages } from './navigation'
-import { NetworkName } from '../lib/network'
+import { NetworkName, getNetwork } from '../lib/network'
 import { Mnemonic, Transactions, Utxos, PublicKeys, Transaction, Utxo } from '../lib/types'
 import { ExplorerName, getExplorerNames, getRestApiExplorerURL } from '../lib/explorers'
 import { defaultExplorer, defaultNetwork } from '../lib/constants'
-import { getKeys, getP2TRAddress, getSilentPaymentScanPrivateKey, isInitialized } from '../lib/wallet'
+import { getP2TRAddress, getSilentPaymentScanPrivateKey, isInitialized } from '../lib/wallet'
 import { SilentiumAPI } from '../lib/silentpayment/silentium/api'
 import { EsploraChainSource } from '../lib/chainsource'
 import { Updater, applyUpdate } from '../lib/updater'
@@ -144,10 +144,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const reloadWallet = async (mnemonic: string, wallet: Wallet) => {
     if (!mnemonic || scanning) return
     try {
-      console.log(
-          await getKeys(mnemonic)
-      )
-
       setScanning(true)
       setScanningProgress(0)
 
@@ -161,7 +157,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       const explorer = new EsploraChainSource(getRestApiExplorerURL(wallet))
       const scanPrivKey = await getSilentPaymentScanPrivateKey(mnemonic, wallet.network)
       const spendPubKey = Buffer.from(wallet.publicKeys[wallet.network].spendPublicKey, 'hex')
-      const p2trScript = address.toOutputScript(getP2TRAddress(wallet))
+      const p2trScript = address.toOutputScript(getP2TRAddress(wallet), getNetwork(wallet.network))
 
       const updater = new Updater(explorer, silentiumAPI, scanPrivKey, spendPubKey, p2trScript)
 
