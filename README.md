@@ -23,7 +23,11 @@ Self-custodial & privacy focused wallet for sending and receiving Silent payment
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-In the project directory, you can run:
+In the project directory, begin by intializing the local dependencies:
+
+### `yarn install`
+
+You can then run:
 
 ### `yarn start`
 
