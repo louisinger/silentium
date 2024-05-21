@@ -168,7 +168,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         try {
           const updateResult = await updater.updateHeight(
             i,
-            wallet.utxos[wallet.network],
+            wallet.utxos[wallet.network] ?? [],
             wallet.mempoolTransactions[wallet.network],
           )
           wallet = {
@@ -178,6 +178,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           setWallet(wallet)
         } catch (e) {
           notify(extractErrorMessage(e))
+          console.error(e)
           continue
         } finally {
           progress += percentPerBlock
