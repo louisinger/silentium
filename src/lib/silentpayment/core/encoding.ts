@@ -1,5 +1,5 @@
 import { bech32m } from '@scure/base';
-import { Network } from 'bitcoinjs-lib';
+import { Network } from '../../network';
 
 export function encodeSilentPaymentAddress(
     scanPubKey: Uint8Array,

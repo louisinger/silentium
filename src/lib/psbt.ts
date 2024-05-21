@@ -1,4 +1,4 @@
-import { Psbt, address } from 'bitcoinjs-lib'
+import { Transaction } from '@scure/btc-signer'
 import { Wallet } from '../providers/wallet'
 import { Utxo } from './types'
 import { CoinsSelected } from './coinSelection'
@@ -13,7 +13,7 @@ export async function buildPsbt(
   destinationAddress: string, 
   wallet: Wallet, 
   mnemonic: string
-): Promise<{ psbt: Psbt, walletOutputs: UtxoWithoutId[] }> {
+): Promise<{ psbt: Transaction, walletOutputs: UtxoWithoutId[] }> {
   const network = getNetwork(wallet.network)
   const { amount, changeAmount, coins } = coinSelection
 
@@ -32,9 +32,11 @@ export async function buildPsbt(
       value: amount,
     })
 
-    if (getP2TRAddress(wallet) === destinationAddress) {
+    const walletP2TR = getP2TRAddress(wallet)
+
+    if (walletP2TR.address === destinationAddress) {
       walletOutputs.push({
-        script: address.toOutputScript(destinationAddress, getNetwork(wallet.network)).toString('hex'),
+        script: Buffer.from(walletP2TR.script).toString('hex'),
         value: amount,
         vout: 0,
       })
@@ -86,22 +88,32 @@ export async function buildPsbt(
 
   outputs.push(...silentPayOutputs)
 
-  const psbt = new Psbt({ network })
-    .addInputs(
-      coins.map((coin: Utxo) => ({
-        hash: coin.txid,
-        index: coin.vout,
-        witnessUtxo: {
-          script: Buffer.from(coin.script, 'hex'),
-          value: coin.value,
-        },
-        tapInternalKey: coin.silentPayment
-          ? Buffer.from(coin.script, 'hex').subarray(2)
-          : Buffer.from(wallet.publicKeys[wallet.network].p2trPublicKey, 'hex').subarray(1),
-      })),
-    )
-    .addOutputs(outputs)
+  const psbt = new Transaction()
 
+  for (const coin of coins) {
+    psbt.addInput({
+      txid: coin.txid,
+      index: coin.vout,
+      witnessUtxo: {
+        amount: BigInt(coin.value),
+        script: Buffer.from(coin.script, 'hex'),
+      },
+      tapInternalKey: coin.silentPayment
+        ? Buffer.from(coin.script, 'hex').subarray(2)
+        : Buffer.from(wallet.publicKeys[wallet.network].p2trPublicKey, 'hex').subarray(1),
+    })
+  }
 
+  for (const output of outputs) {
+    if ('address' in output) {
+      psbt.addOutputAddress(output.address, BigInt(output.value), network)
+    } else {
+      psbt.addOutput({
+        script: output.script,
+        amount: BigInt(output.value),
+      })
+    }
+  }
+  
   return { psbt, walletOutputs }
 }

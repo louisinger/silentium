@@ -1,4 +1,6 @@
-import { Network, networks } from 'bitcoinjs-lib'
+import { NETWORK, TEST_NETWORK} from '@scure/btc-signer'
+
+export type Network = typeof NETWORK
 
 export enum NetworkName {
   Mainnet = 'mainnet',
@@ -16,8 +18,8 @@ export const getNetworkNames = (): [NetworkName, string][] => {
 
 export const getNetwork = (network: NetworkName): Network => {
   const net = network.toLowerCase()
-  if (net === 'mainnet') return networks.bitcoin
-  if (net === 'testnet') return networks.testnet
-  if (net === 'regtest') return networks.regtest
+  if (net === 'mainnet') return NETWORK
+  if (net === 'testnet') return TEST_NETWORK
+  if (net === 'regtest') return TEST_NETWORK
   throw new Error(`Invalid network ${network}`)
 }

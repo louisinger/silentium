@@ -39,7 +39,7 @@ export default function ReceiveSuccess() {
   const { navigate } = useContext(NavigationContext)
   const { wallet } = useContext(WalletContext)
   const silentAddress = getSilentPaymentAddress(wallet)
-  const classicAddress = getP2TRAddress(wallet)
+  const classicAddress = getP2TRAddress(wallet).address
 
   const [type, setType] = useState<AddressType>(AddressType.Silent)
   const [address, setAddress] = useState(getSilentPaymentAddress(wallet))
@@ -50,7 +50,7 @@ export default function ReceiveSuccess() {
     setType(type === AddressType.Silent ? AddressType.Classic : AddressType.Silent)
     switch (type) {
       case AddressType.Silent:
-        setAddress(classicAddress)
+        setAddress(classicAddress!)
         break
       case AddressType.Classic:
         setAddress(silentAddress)

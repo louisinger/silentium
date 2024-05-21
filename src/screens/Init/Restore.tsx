@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
-import { validateMnemonic } from 'bip39'
+import { validateMnemonic } from '@scure/bip39'
+import { wordlist } from '@scure/bip39/wordlists/english';
 import Button from '../../components/Button'
 import Title from '../../components/Title'
 import ButtonsOnBottom from '../../components/ButtonsOnBottom'
@@ -40,7 +41,7 @@ export default function InitOld() {
   useEffect(() => {
     const completed = [...passphrase].filter((a) => a)?.length === 12
     if (!completed) return setLabel(ButtonLabel.Incomplete)
-    const valid = validateMnemonic(passphrase.join(' '))
+    const valid = validateMnemonic(passphrase.join(' '), wordlist)
     setLabel(valid ? ButtonLabel.Ok : ButtonLabel.Invalid)
   }, [passphrase])
 

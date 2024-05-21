@@ -1,28 +1,22 @@
-import * as secp from 'secp256k1'
-import ecc from '@bitcoinerlab/secp256k1'
+import * as secp from '@bitcoinerlab/secp256k1'
 import { Outpoint, PrivateKey } from './types'
-import { createHash } from 'crypto'
+import { schnorr, secp256k1 } from '@noble/curves/secp256k1'
 
 export const createInputHash = (sumOfInputPublicKeys: Buffer, outpoint: Outpoint): Buffer => {
-  return createTaggedHash(
+  return Buffer.from(schnorr.utils.taggedHash(
     'BIP0352/Inputs',
     Buffer.concat([
       Buffer.concat([Buffer.from(outpoint.txid, 'hex').reverse(), serialiseUint32LE(outpoint.vout)]),
       sumOfInputPublicKeys,
     ]),
-  )
-}
-
-export const createTaggedHash = (tag: string, buffer: Buffer): Buffer => {
-  const tagHash = createHash('sha256').update(tag, 'utf8').digest()
-  return createHash('sha256').update(tagHash).update(tagHash).update(buffer).digest()
+  ))
 }
 
 export const calculateSumOfPrivateKeys = (keys: PrivateKey[]): Buffer => {
   if (!keys.length) throw new Error('failed to get input private keys')
   const negatedKeys = keys.map(({ isXOnly, key }) => {
-    if (isXOnly && getPublicKey(key)[0] === 0x03) {
-      return Buffer.from(secp.privateKeyNegate(key))
+    if (isXOnly && shouldBeNegated(key)) {
+      return Buffer.from(secp.privateNegate(key))
     }
     return key
   })
@@ -31,8 +25,12 @@ export const calculateSumOfPrivateKeys = (keys: PrivateKey[]): Buffer => {
     return negatedKeys[0]
   }
 
-  return Buffer.from(
-    negatedKeys.slice(1).reduce((acc, key) => Buffer.from(ecc.privateAdd(acc, key)!), negatedKeys[0]),
+  return negatedKeys.slice(1).reduce(
+    (acc, key) => {
+      const r = secp.privateAdd(acc, key)
+      if (!r) throw new Error('failed to add private keys')
+      return Buffer.from(r)
+    }, negatedKeys[0]
   )
 }
 
@@ -69,7 +67,6 @@ export const encodingLength = (n: number) => {
   return n < 0xfd ? 1 : n <= 0xffff ? 3 : n <= 0xffffffff ? 5 : 9
 }
 
-export const getPublicKey = (privateKey: Buffer): Buffer => {
-  const point = secp.publicKeyCreate(privateKey, true)
-  return Buffer.from(point)
+export const shouldBeNegated = (key: Buffer): boolean => {
+  return secp256k1.getPublicKey(key)[0] === 0x03
 }

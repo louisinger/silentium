@@ -29,7 +29,7 @@ export default function TransactionsList({ short }: { short?: boolean }) {
   const { navigate } = useContext(NavigationContext)
   const { scanning: reloading, wallet } = useContext(WalletContext)
 
-  const transactions = wallet.transactions[wallet.network]
+  const transactions = wallet.transactions[wallet.network] ?? []
 
   if (transactions?.length === 0) return <></>
 

@@ -17,9 +17,10 @@ export async function sendSats(
 ): Promise<sendSatsResult> {
   const { psbt, walletOutputs } = await buildPsbt(coinsSelected, destinationAddress, wallet, mnemonic)
   const signedPsbt = await signPsbt(psbt, coinsSelected.coins, wallet.network, mnemonic)
-  const tx = signedPsbt.finalizeAllInputs().extractTransaction()
-  const txHex = tx.toHex()
-  const txid = tx.getId()
+  signedPsbt.finalize()
+
+  const txHex = Buffer.from(signedPsbt.extract()).toString('hex')
+  const txid = signedPsbt.id
   console.log('txHex', txHex)
   return { 
     hex: txHex,

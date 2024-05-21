@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react'
 import { useStorage } from '../lib/storage'
 import { NavigationContext, Pages } from './navigation'
-import { NetworkName, getNetwork } from '../lib/network'
+import { NetworkName } from '../lib/network'
 import { Mnemonic, Transactions, Utxos, PublicKeys, Transaction, Utxo } from '../lib/types'
 import { ExplorerName, getExplorerNames, getRestApiExplorerURL } from '../lib/explorers'
 import { defaultExplorer, defaultNetwork } from '../lib/constants'
@@ -10,7 +10,6 @@ import { SilentiumAPI } from '../lib/silentpayment/silentium/api'
 import { EsploraChainSource } from '../lib/chainsource'
 import { Updater, applyUpdate } from '../lib/updater'
 import { notify } from '../components/Toast'
-import { address } from 'bitcoinjs-lib'
 
 export interface Wallet {
   explorer: ExplorerName
@@ -157,7 +156,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       const explorer = new EsploraChainSource(getRestApiExplorerURL(wallet))
       const scanPrivKey = await getSilentPaymentScanPrivateKey(mnemonic, wallet.network)
       const spendPubKey = Buffer.from(wallet.publicKeys[wallet.network].spendPublicKey, 'hex')
-      const p2trScript = address.toOutputScript(getP2TRAddress(wallet), getNetwork(wallet.network))
+      const p2trScript = Buffer.from(getP2TRAddress(wallet).script)
 
       const updater = new Updater(explorer, silentiumAPI, scanPrivKey, spendPubKey, p2trScript)
 
@@ -182,8 +181,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
           continue
         } finally {
           progress += percentPerBlock
-          progress = Math.min(Math.round(progress), 100)
-          setScanningProgress(progress)
+          progress = Math.min(progress, 100)
+          setScanningProgress(Math.round(progress))
         }
       }
     } catch (e) {

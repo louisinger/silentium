@@ -4,7 +4,8 @@ import ButtonsOnBottom from '../../components/ButtonsOnBottom'
 import Columns from '../../components/Columns'
 import Title from '../../components/Title'
 import Word from '../../components/Word'
-import { generateMnemonic } from 'bip39'
+import { generateMnemonic } from '@scure/bip39'
+import { wordlist } from '@scure/bip39/wordlists/english';
 import { NavigationContext, Pages } from '../../providers/navigation'
 import { Mnemonic } from '../../lib/types'
 import Content from '../../components/Content'
@@ -15,7 +16,7 @@ export default function InitNew() {
   const { navigate } = useContext(NavigationContext)
   const { setInitInfo } = useContext(FlowContext)
 
-  const mnemonic = generateMnemonic() as Mnemonic
+  const mnemonic = generateMnemonic(wordlist) as Mnemonic
 
   const handleCancel = () => navigate(Pages.Init)
 

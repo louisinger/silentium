@@ -1,8 +1,9 @@
-import { Network } from 'bitcoinjs-lib';
-import * as secp from 'secp256k1';
+import * as secp from '@bitcoinerlab/secp256k1';
 import { Outpoint, Output, PrivateKey, RecipientAddress } from './types';
-import { calculateSumOfPrivateKeys, createInputHash, createTaggedHash, getPublicKey, serialiseUint32 } from './utils';
+import { calculateSumOfPrivateKeys, createInputHash, serialiseUint32 } from './utils';
 import { decodeSilentPaymentAddress } from './encoding';
+import { schnorr, secp256k1 } from '@noble/curves/secp256k1';
+import { Network } from '../../network';
 
 export function createOutputs(
     inputPrivateKeys: PrivateKey[],
@@ -12,7 +13,7 @@ export function createOutputs(
 ): [Output[], string[]] {
     const sumOfPrivateKeys = calculateSumOfPrivateKeys(inputPrivateKeys);
     const inputHash = createInputHash(
-        getPublicKey(sumOfPrivateKeys),
+        Buffer.from(secp256k1.getPublicKey(sumOfPrivateKeys, true)),
         smallestOutpoint,
     );
 
@@ -39,29 +40,42 @@ export function createOutputs(
     const tweaks: string[] = [];
     for (const [scanKeyHex, paymentGroup] of paymentGroups.entries()) {
         const scanKey = Buffer.from(scanKeyHex, 'hex');
-        const point = secp.publicKeyTweakMul(
+        const point = secp.pointMultiply(
             Buffer.from(scanKey), 
             Buffer.from(inputHash), 
             true
         );
-        const ecdhSecret = secp.publicKeyTweakMul(
+
+        if (!point) {
+            throw new Error('Could not derive point');
+        }
+
+        const ecdhSecret = secp.pointMultiply(
             Buffer.from(point),
             Buffer.from(sumOfPrivateKeys),
             true,
         );
 
+        if (!ecdhSecret) {
+            throw new Error('Could not derive ecdhSecret');
+        }
+
         let n = 0;
         for (const { spendKey, amount } of paymentGroup) {
-            const tweak = createTaggedHash(
+            const tweak = schnorr.utils.taggedHash(
                 'BIP0352/SharedSecret',
                 Buffer.concat([Buffer.from(ecdhSecret), serialiseUint32(n)]),
             );
 
-            const publicKey = secp.publicKeyTweakAdd(
+            const publicKey = secp.pointAddScalar(
                 Buffer.from(spendKey),
                 Buffer.from(tweak),
                 true,
             );
+
+            if (!publicKey) {
+                throw new Error('Could not derive public key');
+            }
 
             const script = Buffer.concat([
                 Buffer.from([0x51, 0x20]),
@@ -72,7 +86,7 @@ export function createOutputs(
                 script,
                 value: amount,
             });
-            tweaks.push(tweak.toString('hex'));
+            tweaks.push(Buffer.from(tweak).toString('hex'));
             n++;
         }
     }

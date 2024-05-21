@@ -1,17 +1,21 @@
-import { Psbt, Transaction } from 'bitcoinjs-lib'
-import { ECPairFactory } from 'ecpair'
-import ecc from '@bitcoinerlab/secp256k1'
+import { Transaction } from '@scure/btc-signer'
 import { getCoinPrivKey } from './wallet'
 import { Mnemonic, Utxo } from './types'
 import { NetworkName } from './network'
 
-const ECPair = ECPairFactory(ecc)
+export async function signPsbt(tx: Transaction, coins: Utxo[], network: NetworkName, mnemonic: Mnemonic) {
+  for (let i = 0; i < tx.inputsLength; i++) {
+    const coin = coins[i]
+    const privateKey = await getCoinPrivKey(coin, network, mnemonic)
 
-export async function signPsbt(partial: Psbt, coins: Utxo[], network: NetworkName, mnemonic: Mnemonic) {
-  for (const [index] of partial.data.inputs.entries()) {
-    const privateKey = await getCoinPrivKey(coins[index], network, mnemonic)
-    partial.signInput(index, ECPair.fromPrivateKey(privateKey), [Transaction.SIGHASH_DEFAULT])
+    if (!tx.signIdx(
+      privateKey,
+      i,
+      [0x00]
+    )) {
+      throw new Error('Could not sign input')
+    }
   }
 
-  return partial
+  return tx
 }
