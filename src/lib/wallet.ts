@@ -1,4 +1,4 @@
-import * as ecc from '@noble/secp256k1'
+import * as ecc from '@bitcoinerlab/secp256k1'
 import { HDKey } from '@scure/bip32'
 import { mnemonicToSeed } from '@scure/bip39'
 import { p2tr, p2tr_pk } from '@scure/btc-signer'
@@ -16,10 +16,9 @@ export async function getCoinPrivKey(coin: Utxo, network: NetworkName, mnemonic:
 
   if (coin.silentPayment) {
     const { spend } = deriveBIP352Keys(masterNode, network === NetworkName.Mainnet)
-    const privKey = ecc.ProjectivePoint
-      .fromPrivateKey(spend.privateKey!)
-      .add(ecc.ProjectivePoint.fromHex(coin.silentPayment.tweak))
-    return Buffer.from(privKey.toRawBytes(true))
+    const privKey = ecc.privateAdd(spend.privateKey!, Buffer.from(coin.silentPayment.tweak, 'hex'))
+    if (!privKey) throw new Error('Could not derive private key')
+    return Buffer.from(privKey)
   }
 
   const { p2trPublicKey } = getP2TRPublicKey(masterNode, network)
@@ -61,13 +60,14 @@ const getP2TRPrivateKey = (master: HDKey, network: NetworkName, tweaked: boolean
   const hasOddY = key.publicKey[0] === 3 || (key.publicKey[0] === 4 && (key.publicKey[64] & 1) === 1);
   let privKey = key.privateKey;
   if (hasOddY) {
-    const negated = ecc.ProjectivePoint.fromPrivateKey(privKey).negate();
-    if (!negated) throw new Error('Could not negate private key');
-    privKey = Buffer.from(negated.toRawBytes(true));
+    const negated = ecc.privateNegate(privKey);
+    privKey = Buffer.from(negated);
   }
 
-  const tweakedPrivateKey = ecc.ProjectivePoint.fromPrivateKey(privKey).add(ecc.ProjectivePoint.fromHex(tweak));
-  return { p2trPrivateKey: Buffer.from(tweakedPrivateKey.toRawBytes(true)) }
+  const tweakedPrivateKey = ecc.privateAdd(privKey, tweak)
+  if (!tweakedPrivateKey) throw new Error('Could not derive tweaked private key')
+  
+  return { p2trPrivateKey: Buffer.from(tweakedPrivateKey) }
 }
 
 const getPublicKeys = (master: HDKey, network: NetworkName): Keys => ({

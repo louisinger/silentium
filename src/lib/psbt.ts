@@ -94,6 +94,7 @@ export async function buildPsbt(
     psbt.addInput({
       txid: coin.txid,
       index: coin.vout,
+      sighashType: 0,
       witnessUtxo: {
         amount: BigInt(coin.value),
         script: Buffer.from(coin.script, 'hex'),
