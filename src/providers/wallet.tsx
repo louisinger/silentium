@@ -158,7 +158,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       const spendPubKey = Buffer.from(wallet.publicKeys[wallet.network].spendPublicKey, 'hex')
       const p2trScript = Buffer.from(getP2TRAddress(wallet).script)
 
-      const updater = new Updater(explorer, silentiumAPI, scanPrivKey, spendPubKey, p2trScript)
+      const updater = new Updater(explorer, scanPrivKey, spendPubKey, p2trScript)
 
       const totalBlocks = chainTip - wallet.scannedBlockHeight[wallet.network]
       const percentPerBlock = 100 / totalBlocks
@@ -166,8 +166,10 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
       for (let i = wallet.scannedBlockHeight[wallet.network] + 1; i <= chainTip; i++) {
         try {
+          const blockData = await silentiumAPI.getBlockData(i)
+
           const updateResult = await updater.updateHeight(
-            i,
+            blockData,
             wallet.utxos[wallet.network] ?? [],
             wallet.mempoolTransactions[wallet.network],
           )

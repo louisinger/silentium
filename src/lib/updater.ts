@@ -1,6 +1,6 @@
 import { BasicFilter } from 'bip158'
 import { ChainSource } from './chainsource'
-import { SilentiumAPI } from './silentpayment/silentium/api'
+import { BIP352BlockData } from './silentpayment/silentium/api'
 import { Transaction, Utxo } from './types'
 import { scan, computeScript, computeTweak } from '../lib/silentpayment/scanning'
 import { Wallet } from '../providers/wallet'
@@ -14,19 +14,16 @@ type UpdateResult = {
 export class Updater {
   constructor(
     private chainSource: ChainSource,
-    private silentiumAPI: SilentiumAPI,
     private scanPrivateKey: Buffer,
     private spendPublicKey: Buffer,
     private p2trScript: Buffer,
   ) {}
 
-  async updateHeight(height: number, currentUtxos: Utxo[], mempoolTxs: Transaction[]): Promise<UpdateResult> {
-    const { filter, blockhash } = await this.silentiumAPI.getBlockFilter(height)
-    const blockScalars = await this.silentiumAPI.getBlockScalars(height)
-
+  async updateHeight(blockData: BIP352BlockData, currentUtxos: Utxo[], mempoolTxs: Transaction[]): Promise<UpdateResult> {
+    const { scalars, filter, blockhash } = blockData
     const basicFilter = new BasicFilter(blockhash, filter)
 
-    const scriptsInBlock = scan(this.scanPrivateKey, this.spendPublicKey, blockScalars.scalars.map(h2b), basicFilter)
+    const scriptsInBlock = scan(this.scanPrivateKey, this.spendPublicKey, scalars, basicFilter)
 
     const silentPayUtxosScripts = currentUtxos
       .filter((utxo) => utxo.silentPayment !== undefined)
@@ -122,7 +119,7 @@ export class Updater {
             script: output.script.toString('hex'),
             value: output.value,
             silentPayment: {
-              tweak: computeTweak(this.scanPrivateKey, scalar, 0).toString('hex'),
+              tweak: computeTweak(this.scanPrivateKey, h2b(scalar), 0).toString('hex'),
             },
           })
           txInfo.amount += output.value
@@ -130,7 +127,7 @@ export class Updater {
           fundedScriptsToFind.delete(script)
 
           let nextCounter = 1
-          let nextScript = computeScript(this.scanPrivateKey, this.spendPublicKey, nextCounter, scalar)
+          let nextScript = computeScript(this.scanPrivateKey, this.spendPublicKey, nextCounter, h2b(scalar))
 
           for (let i = vout + 1; i < tx.outs.length; i++) {
             if (tx.outs[i].script.equals(nextScript)) {
@@ -140,14 +137,14 @@ export class Updater {
                 script: tx.outs[i].script.toString('hex'),
                 value: tx.outs[i].value,
                 silentPayment: {
-                  tweak: computeTweak(this.scanPrivateKey, scalar, nextCounter).toString('hex'),
+                  tweak: computeTweak(this.scanPrivateKey, h2b(scalar), nextCounter).toString('hex'),
                 },
               })
               isWalletTx = true
               txInfo.amount += tx.outs[i].value
 
               nextCounter++
-              nextScript = computeScript(this.scanPrivateKey, this.spendPublicKey, nextCounter, scalar)
+              nextScript = computeScript(this.scanPrivateKey, this.spendPublicKey, nextCounter, h2b(scalar))
             }
           }
         }

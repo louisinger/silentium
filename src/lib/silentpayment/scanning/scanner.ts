@@ -1,4 +1,5 @@
 import * as secp from '@noble/secp256k1'
+import { compute_scripts } from 'bip352-tweaker'
 import { BasicFilter } from 'bip158'
 import { serialiseUint32 } from '../core/utils'
 import { schnorr } from '@noble/curves/secp256k1'
@@ -10,19 +11,17 @@ const taprootScriptPrefix = Buffer.from([0x51, 0x20])
 export function scan(
   scanPrivateKey: Buffer,
   spendPublicKey: Buffer,
-  scalars: Buffer[],
+  scalars: string[],
   basicFilter: BasicFilter,
-): Map<string, Buffer> {
-  const spendPoint = secp.ProjectivePoint.fromHex(spendPublicKey)
-  // Map<Script, Scalar>
-  const scripts = scalars.map((s) => computeScriptFromPoint(scanPrivateKey, spendPoint, 0, s))
-  const inblock = basicFilter.filter(scripts).map((s) => s.toString('hex'))
+): Map<string, string> {
+  const scripts = compute_scripts(scanPrivateKey.toString('hex'), spendPublicKey.toString('hex'), 0, scalars)
+  const inblock = basicFilter.filter(scripts.map(Buffer.from))
 
-  const result = new Map<string, Buffer>()
+  const result = new Map<string, string>()
   for (const script of inblock) {
-    const scalar = scalars.find((_, i) => script === scripts[i].toString('hex'))
+    const scalar = scalars.find((_, i) => script.equals(Buffer.from(scripts[i])))
     if (scalar) {
-      result.set(script, scalar)
+      result.set(script.toString('hex'), scalar)
     }
   }
 
@@ -35,11 +34,8 @@ export function computeTweak(scanPrivateKey: Buffer, scalar: Buffer, counter: nu
 }
 
 export function computeScript(scanPrivateKey: Buffer, spendPublicKey: Buffer, counter: number, scalar: Buffer): Buffer {
-  return computeScriptFromPoint(scanPrivateKey, secp.ProjectivePoint.fromHex(spendPublicKey), counter, scalar)
-}
-
-export function computeScriptFromPoint(scanPrivateKey: Buffer, spendPoint: secp.ProjectivePoint, counter: number, point: Buffer): Buffer {
-  const tweak = computeTweak(scanPrivateKey, point, counter)
+  const spendPoint = secp.ProjectivePoint.fromHex(spendPublicKey)
+  const tweak = computeTweak(scanPrivateKey, scalar, counter)
 
   const publicKey = spendPoint
     .add(secp.ProjectivePoint.fromPrivateKey(tweak))

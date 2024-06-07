@@ -36,7 +36,12 @@ module.exports = {
         vm: require.resolve('vm-browserify'),
         fs: false,
       }
+      webpackConfig.experiments = { asyncWebAssembly: true }
+      webpackConfig.module.rules
+        .find((i) => 'oneOf' in i)
+        .oneOf.find((i) => i.type === 'asset/resource')
+        .exclude.push(/\.wasm$/);
       return webpackConfig
-    },
-  },
+    }
+  }
 }
