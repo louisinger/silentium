@@ -59,6 +59,10 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 - Compact block filter for light clients [BIP158](https://bips.dev/158)
 - [Helm wallet](https://github.com/bordalix/helm-wallet) by [bordalix](https://github.com/bordalix)
 
+## Buy me a coffee
+
+sp1qq0ze7c565fg6nlgs5u0uthc6vt56pxajy8cn0vjew4nmttk80wm7gqmzyqqs92glsms2e7482966zs5u83wecz8yjn8ntaejh7y7lgr96s22p7hu
+
 ## License
 
 <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/louisinger/silentium">silentium</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://github.com/louisinger">Louis Singer</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Creative Commons Attribution 4.0 International<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""></a></p>
